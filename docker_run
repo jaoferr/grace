@@ -1,0 +1,5 @@
+docker run -p 3306:3306 --name grace_mysql -dit \
+-e MYSQL_DATABASE=grace2 \
+-e MYSQL_USER=admin -e MYSQL_PASSWORD=admin \
+-e MYSQL_ROOT_PASSWORD=development \
+mysql/mysql-server:latest
