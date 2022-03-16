@@ -1,3 +1,3 @@
 class Config(object):
-    PREFIX = '/v1'
+    PREFIX = '/api/v1'
     TAG = 'v1'

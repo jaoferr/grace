@@ -1,11 +1,16 @@
-from app.routers.api_v1.config import Config
-from fastapi import Depends, APIRouter, HTTPException
+from tempfile import NamedTemporaryFile
+from fastapi import Depends, APIRouter, HTTPException, UploadFile, BackgroundTasks
 from sqlalchemy.orm import Session
-from app.crud import resumes as crud_resumes
-from app.schemas import schemas
-from app.db.dependency import get_db
 from bson.objectid import ObjectId
-from app.crud import constraints
+from app import schemas, models
+from app.crud import resumes as crud_resumes
+from app.crud import constraints as crud_constraints
+from app.tasks import ingest
+from app.dependencies import TikaServer
+from app.core.config import settings
+from app.db.dependency import get_db
+from app.auth.token import get_current_user
+from app.routers.api_v1.config import Config
 
 
 router = APIRouter(
@@ -16,35 +21,135 @@ router = APIRouter(
     }
 )
 
-@router.get('/{resume_id}', response_model=schemas.Resume)
-def get_resume(resume_id: int, db: Session = Depends(get_db)):
-    resume = crud_resumes.get_resume(db, id=resume_id)
-    if resume is None:
-        raise HTTPException(404, 'User not found')
-    return resume
-
 @router.get('/from_user/{user_id}', response_model=list[schemas.Resume])
 def get_resumes_from_user(user_id: int, skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
-    resumes = crud_resumes.get_resumes_user_id(db, user_id, skip=skip, limit=limit)
+    resumes = crud_resumes.get_resumes_by_user_id(db, user_id, skip=skip, limit=limit)
+    return resumes
+
+@router.get('/from_current_user/', response_model=list[schemas.Resume])
+def get_resumes_from_current_user(skip: int = 0, limit: int = 20, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    resumes = crud_resumes.get_resumes_by_user_id(db=db, user_id=current_user.id, skip=skip, limit=limit)
     return resumes
 
 @router.get('/from_batch/{batch_id}', response_model=list[schemas.Resume])
-def get_resumes_by_batch_id(batch_id: str, skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
-    resumes = crud_resumes.get_resumes_by_batch_id(db, batch_id)
+def get_resumes_by_batch_id(
+    batch_id: str, skip: int = 0, limit: int = 20, 
+    db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)
+):
+    if not crud_constraints.batch_exists_and_belongs_to_user(db, user_id=current_user.id, batch_id=batch_id):
+        raise HTTPException(status_code=404, detail=f'batch "{batch_id}" does not exist')
+    
+    resumes = crud_resumes.get_resumes_by_batch_id(db, skip=skip, limit=limit, batch_id=batch_id)
     return resumes
 
-@router.post('/', response_model=schemas.Resume)
-def create_resume(resume: schemas.ResumeIndexCreate, db: Session = Depends(get_db)):
-    resume.object_id = ObjectId()
-    db_resume = crud_resumes.get_resume(db, object_id=resume.object_id)
-    if db_resume:
-        raise HTTPException(status_code=400, detail='resume already exists in index')
-    if not constraints.is_user_in_db(db, resume.user_id):
-        raise HTTPException(status_code=404, detail='user not found')
-    new_resume = crud_resumes.create_resume(db, resume)
-    return new_resume
+# @router.post('/create', response_model=schemas.Resume)
+# def create_resume(resume: schemas.ResumeCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+#     new_resume = schemas.ResumeCreateInternal(**resume.dict())
+#     new_resume.object_id = ObjectId()
+#     new_resume.user_id = current_user.id
+
+#     db_resume = crud_resumes.get_resume_by_object_id(db, new_resume.object_id)
+#     if db_resume:
+#         raise HTTPException(status_code=400, detail='resume already exists in index')
+#     if not constraints.is_user_in_db(db, current_user.id):
+#         raise HTTPException(status_code=404, detail='user not found')
+
+#     return crud_resumes.create_resume(db, new_resume)
 
 @router.get('/', response_model=list[schemas.Resume])
 def get_all_resumes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):  # debug
     resumes = crud_resumes.get_resumes(db, skip=skip, limit=limit)
     return resumes
+
+@router.get('/content/{resume_id}', response_model=schemas.ResumeContent)
+def get_resume_content(resume_id: int, db: Session = Depends(get_db)):  # to be removed
+    resume = crud_resumes.get_resume(db, resume_id)
+    if resume is None:
+        raise HTTPException(status_code=404, detail='resume does not exist')
+    if resume.content is None:
+        return {'content_keys': []}
+
+    content_keys = list(resume.content.keys())
+    return {'content_keys': content_keys}
+
+@router.post('/ingest', status_code=202)
+async def ingest_resume(
+    tag: str, file: UploadFile, background_tasks: BackgroundTasks,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    is_tika_running = TikaServer.check_server()
+    if not is_tika_running:
+        raise HTTPException(503, detail='ingest endpoint is not available')
+
+    file_size: int = settings.Hardcoded.MAX_ZIP_FILE_SIZE
+    real_file_size = 0
+
+    if file.content_type not in ['application/x-zip-compressed']:
+        raise HTTPException(400, detail='invalid file type')
+
+    temp_file = NamedTemporaryFile(delete=False)
+    for chunk in file.file:
+        real_file_size += len(chunk)
+        if real_file_size > file_size:
+            raise HTTPException(413, detail='file size exceeds limit')
+        temp_file.write(chunk)
+
+    batch_id = str(ObjectId())
+    background_tasks.add_task(
+        ingest.launch_task, file=temp_file,
+        user=current_user, batch_id=batch_id,
+        db=db, tag=tag
+    )
+    await file.close()
+
+    return {'detail': 'task was added to queue', 'batch_id': batch_id}
+
+import csv
+import os
+from datetime import datetime
+@router.get('/export/', status_code=202)
+def export_resumes(current_user: models.User = Depends(get_current_user)):
+    resumes: list[models.Resume] = current_user.resumes
+    export_time = str(datetime.utcnow()).replace(" ", "_").replace(':', '-')
+    filename = f'export_user_{current_user.username}_{export_time}.csv'
+    filepath = os.path.join(settings.Config.basedir, 'export', filename)
+    with open(filepath, 'w') as csvfile:
+        outcsv = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        header = ['user_id', 'object_id', 'filename', 'timestamp', 'id', 'batch_id', 'content']
+        outcsv.writerow(header)
+        for record in resumes:
+            row = [
+                record.user_id,
+                record.object_id,
+                record.filename,
+                str(record.timestamp),
+                record.id,
+                record.batch_id,
+                str(record.content).replace(',', ' ').replace(';', ' ').replace('\t', ' ')
+            ]
+            outcsv.writerow(row)
+
+    return {'detail': f'exported user "{current_user.username}" resumes to {filepath}'}
+
+
+@router.get('/{resume_id}', response_model=schemas.Resume)
+def get_resume(resume_id: int, db: Session = Depends(get_db)):
+    resume = crud_resumes.get_resume(db, resume_id)
+    if resume is None:
+        raise HTTPException(404, 'User not found')
+    return resume
+
+@router.get('/tag/{tag}', response_model=schemas.ResumeTag)
+def get_resumes_by_tag(
+    tag: str, skip: int = 0, limit: int = 100,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    if not crud_constraints.tag_exists_and_belongs_to_user(db, user_id=current_user.id, tag=tag):
+        raise HTTPException(status_code=404, detail=f'tag "{tag}" does not exist')
+    
+    tag = db.query(models.ResumeTag).filter_by(tag=tag, user_id=current_user.id).first()
+    tag.resumes = tag.resumes[skip:limit]
+
+    return tag

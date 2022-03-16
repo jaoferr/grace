@@ -26,8 +26,8 @@ target_metadata = models.Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-from app.core.config import create_sql_connection_object
-config.set_main_option('sqlalchemy.url', create_sql_connection_object(silent=True).connection_string)
+from app.core.config import SQLSettings
+config.set_main_option('sqlalchemy.url', str(SQLSettings.ALEMBIC_CONNECTION_STRING))
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
