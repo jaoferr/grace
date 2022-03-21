@@ -7,6 +7,10 @@ class ResumeBase(BaseModel):
     object_id: str
 
 
+class ResumeCreateExternal(BaseModel):
+    tag: str
+
+
 class ResumeCreate(ResumeBase):
     user_id: int
     filename: str

@@ -10,3 +10,6 @@ def tag_exists_and_belongs_to_user(db: Session, tag: str, user_id: int):
 
 def batch_exists_and_belongs_to_user(db: Session, batch_id: str, user_id: int):
     return bool(db.query(models.Batch).filter_by(id=batch_id, user_id=user_id).first())
+
+def job_exists_and_belongs_to_user(db: Session, description: str, user_id: int):
+    return bool(db.query(models.Jobs).filter_by(description=description, user_id=user_id).first())
