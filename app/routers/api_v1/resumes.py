@@ -2,10 +2,10 @@ import csv
 import os
 from datetime import datetime
 from tempfile import NamedTemporaryFile
-from fastapi import Depends, APIRouter, HTTPException, UploadFile, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, BackgroundTasks
 from sqlalchemy.orm import Session
 from bson.objectid import ObjectId
-from app import schemas, models
+from app import models, schemas
 from app.crud import resumes as crud_resumes
 from app.crud import constraints as crud_constraints
 from app.tasks import ingest
