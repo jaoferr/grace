@@ -1,7 +1,7 @@
 import os
-from typing import Any, Dict, List, Optional, Union
+from typing import List, Optional, Union
 from pydantic import AnyHttpUrl, BaseSettings, validator
-from sqlalchemy.engine import url
+from sqlalchemy.engine.url import URL
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -25,6 +25,7 @@ class Settings(BaseSettings):
 
     # sql db
     SQL_DRIVER: str
+    SQL_ALEMBIC_DRIVER: str
     SQL_USER: str
     SQL_PASSWORD: str
     SQL_HOST: str
@@ -32,30 +33,42 @@ class Settings(BaseSettings):
     SQL_DATABASE: str    
     SQL_DATABASE_URI: Optional[str]
 
+    # tika
+    TIKA_ADAPTER: str
+    TIKA_HOST: str
+    TIKA_PORT: str
+
+
     class Config:
         case_sensitive = True
         env_file = ".env"
         basedir = basedir
 
+    class Hardcoded:
+        ALLOWED_EXTENSIONS = [
+            'pdf', # 'doc', 'docx', 'jpeg', 'jpg'
+        ]
+        MAX_ZIP_FILE_SIZE = 1000 * 1e6  # 1GB
+
 
 settings = Settings()
 
-class SQLConnection:
-    def __init__(self, server_driver: str = None, connection_string: str = None, connect_args: dict = None) -> None:
-        self.app_settings = settings
+class SQLSettings:
+    
+    CONNECTION_STRING = URL.create(
+        drivername=settings.SQL_DRIVER,
+        username=settings.SQL_USER,
+        password=settings.SQL_PASSWORD,
+        host=settings.SQL_HOST,
+        port=settings.SQL_PORT,
+        database=settings.SQL_DATABASE
+    )
 
-        self.server_driver = server_driver or 'sqlite:///'
-        self.connection_string = connection_string or 'sqlite:///' + os.path.join(settings.Config.basedir, 'app.db')
-        self.connect_args = connect_args or {'check_same_thread': False}
-
-def create_sql_connection_object(silent: bool = False, settings: Settings = settings):
-    try:
-        sql_connection = SQLConnection(settings.SQL_DRIVER)
-        sql_connection.connection_string = f'{settings.SQL_DRIVER}://{settings.SQL_USER}:{settings.SQL_PASSWORD}@{settings.SQL_HOST}:{settings.SQL_PORT}/{settings.SQL_DATABASE}'
-        sql_connection.connect_args = {}
-        return sql_connection
-    except Exception as e:
-        if not silent:
-            print('Invalid SQL connection arguments. Defaulting to SQLite.')
-            print('Raised exception:', e)
-        return SQLConnection()
+    ALEMBIC_CONNECTION_STRING = URL.create(
+        drivername=settings.SQL_ALEMBIC_DRIVER,
+        username=settings.SQL_USER,
+        password=settings.SQL_PASSWORD,
+        host=settings.SQL_HOST,
+        port=settings.SQL_PORT,
+        database=settings.SQL_DATABASE
+    )

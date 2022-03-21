@@ -3,3 +3,7 @@ docker run -p 3306:3306 --name grace_mysql -dit \
 -e MYSQL_USER=admin -e MYSQL_PASSWORD=admin \
 -e MYSQL_ROOT_PASSWORD=development \
 mysql/mysql-server:latest
+
+docker run --name grace_mongo -p 27017:27017 -dit mongo:latest
+
+docker run --name grace_tika -p 9998:9998 -dit apache/tika:latest

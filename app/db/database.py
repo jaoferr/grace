@@ -1,16 +1,24 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 from sqlalchemy.orm import sessionmaker
-from app.core.config import SQLConnection, create_sql_connection_object
+from sqlalchemy import exc as sql_exc
+from app.core.config import SQLSettings
+from app.core.logging import logger
 
 
-sql_connection_object = create_sql_connection_object()
-engine = create_engine(
-    sql_connection_object.connection_string, pool_pre_ping=True,
-    connect_args=sql_connection_object.connect_args
-)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+def start_sql_engine():
+    try:
+        engine = create_engine(SQLSettings.CONNECTION_STRING, pool_pre_ping=True)
+        engine.connect()
+        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+        return engine, SessionLocal
+    except sql_exc.SQLAlchemyError as err:
+        logger.warning(err)
+        logger.warning(f'Database server is not running. App will not work properly.')
+        return None, None
 
+engine, SessionLocal = start_sql_engine()
+       
 
 @as_declarative()
 class Base:
