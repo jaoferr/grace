@@ -1,6 +1,11 @@
 from tika import parser
 from io import BytesIO
+
 from unidecode import unidecode
+import string
+import re
+from nltk.corpus import stopwords
+
 from app.dependencies import TikaServer
 
 
@@ -16,6 +21,18 @@ class ResumeObject:
         return vars(self)
 
 
+def basic_clean_up(text: str) -> str:
+    text = unidecode(text)
+    text = text.lower() \
+        .replace('\n', '') \
+        .strip() \
+        .translate(str.maketrans('', '', string.punctuation))
+    clean_up_pattern = re.compile(r'\b{}\b'.format(r'\b|\b'.join(stopwords.words())))  # removes stopwords
+    text = clean_up_pattern.sub('', text)
+
+    return text
+
+
 class IngestingEngine:
 
     TIKA_SERVER_ENDPOINT = TikaServer.ENDPOINT
@@ -25,9 +42,8 @@ class IngestingEngine:
         ''' Process "any" file with tika '''
         parsed_pdf = parser.from_buffer(file_bytes.read(), serverEndpoint=cls.TIKA_SERVER_ENDPOINT)
         data = parsed_pdf.get('content')
-        data = data.lower().replace('\n', '').strip()
-        data = unidecode(data)
         # insert other processing steps here
+        data = basic_clean_up(data)
         result = {
             'content': data
         }

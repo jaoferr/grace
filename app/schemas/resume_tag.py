@@ -7,8 +7,13 @@ class ResumeTagBase(BaseModel):
     tag: str
 
 
+class ResumeTagQuery(ResumeTagBase):
+    pass
+
+
 class ResumeTagCreate(ResumeTagBase):
     pass
+
 
 class ResumeTag(ResumeTagBase):
     id: int
