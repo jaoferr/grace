@@ -13,7 +13,8 @@ from app.core.config import settings
 from app.routers.api_v1 import users, main, resumes, auth, jobs, recommendation
 from app.routers.api_v1.config import Config as api_v1_config
 
-SQL_DATABASE_URI = 'sqlite:///./test_db.db'
+
+SQL_DATABASE_URI = 'sqlite://'
 engine = create_engine(
     SQL_DATABASE_URI, connect_args={'check_same_thread': False}
 )

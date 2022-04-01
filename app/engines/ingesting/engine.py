@@ -1,9 +1,11 @@
+import os
 from tika import parser
 from io import BytesIO
 
 from unidecode import unidecode
 import string
 import re
+import nltk
 from nltk.corpus import stopwords
 
 from app.dependencies import TikaServer
@@ -36,6 +38,10 @@ def basic_clean_up(text: str) -> str:
 class IngestingEngine:
 
     TIKA_SERVER_ENDPOINT = TikaServer.ENDPOINT
+
+    def __init__(self) -> None:
+        if not os.path.exists('/stopwords'):
+            nltk.download('stopwords')
 
     @classmethod
     def process_file(cls, file_bytes: BytesIO):

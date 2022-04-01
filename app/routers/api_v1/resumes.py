@@ -63,11 +63,12 @@ def get_resume_content(resume_id: int, db: Session = Depends(get_db)):  # to be 
 
 @router.post('/ingest', status_code=202)
 async def ingest_resume(
-    # tag: str, 
-    tag: schemas.ResumeCreateExternal,
+    tag: str, 
+    # tag: schemas.ResumeCreateExternal,
     file: UploadFile, background_tasks: BackgroundTasks,
     current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)):
+    db: Session = Depends(get_db)
+    ):
     is_tika_running = TikaServer.check_server()
     if not is_tika_running:
         raise HTTPException(503, detail='ingest endpoint is not available')
@@ -75,7 +76,7 @@ async def ingest_resume(
     file_size: int = settings.Hardcoded.MAX_ZIP_FILE_SIZE
     real_file_size = 0
 
-    if file.content_type not in ['application/x-zip-compressed']:
+    if file.content_type not in ['application/x-zip-compressed', 'application/zip']:
         raise HTTPException(400, detail='invalid file type')
 
     temp_file = NamedTemporaryFile(delete=False)
@@ -89,7 +90,7 @@ async def ingest_resume(
     background_tasks.add_task(
         ingest.launch_task, file=temp_file,
         user=current_user, batch_id=batch_id,
-        db=db, tag=tag.tag
+        db=db, tag=tag # .tag
     )
     await file.close()
 

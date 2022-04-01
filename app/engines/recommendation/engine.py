@@ -1,3 +1,4 @@
+import os
 import re
 import nltk
 import Levenshtein
@@ -11,6 +12,9 @@ class RecommendingEngine:
 
     def __init__(self, weighted_methods: dict[str: float]) -> None:
         self.weighted_methods = self.init_methods(weighted_methods)
+
+        if not os.path.exists('/stopwords'):
+            nltk.download('punkt')
 
     class Methods:
 
