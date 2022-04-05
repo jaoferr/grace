@@ -50,30 +50,14 @@ def get_resumes_by_batch_id(
     resumes = crud_resumes.get_resumes_by_batch_id(db, skip=skip, limit=limit, batch_id=batch_id)
     return resumes
 
-@router.get('/', response_model=list[schemas.Resume])
-def get_all_resumes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):  # debug
-    resumes = crud_resumes.get_resumes(db, skip=skip, limit=limit)
-    return resumes
-
-@router.get('/content/{resume_id}', response_model=schemas.ResumeContent)
-def get_resume_content(resume_id: int, db: Session = Depends(get_db)):  # to be removed
-    resume = crud_resumes.get_resume(db, resume_id)
-    if resume is None:
-        raise HTTPException(status_code=404, detail='resume does not exist')
-    if resume.content is None:
-        return {'content_keys': []}
-
-    content_keys = list(resume.content.keys())
-    return {'content_keys': content_keys}
-
+from fastapi import Form
 @router.post('/ingest', status_code=202)
 async def ingest_resume(
-    tag: str, 
-    # tag: schemas.ResumeCreateExternal,
     file: UploadFile, background_tasks: BackgroundTasks,
+    tag: str = Form(...),
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
-    ):
+):
     is_tika_running = TikaServer.check_server()
     if not is_tika_running:
         raise HTTPException(503, detail='ingest endpoint is not available')

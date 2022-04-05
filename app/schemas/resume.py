@@ -1,14 +1,11 @@
 from typing import Optional, Dict, Any, List
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
+from fastapi import Form
 
 
 class ResumeBase(BaseModel):
     object_id: str
-
-
-class ResumeCreateExternal(BaseModel):
-    tag: str
 
 
 class ResumeCreate(ResumeBase):
