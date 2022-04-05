@@ -30,7 +30,11 @@ def get_resumes_from_user(user_id: int, skip: int = 0, limit: int = 20, db: Sess
     return resumes
 
 @router.get('/from_current_user/', response_model=list[schemas.Resume])
-def get_resumes_from_current_user(skip: int = 0, limit: int = 20, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_resumes_from_current_user(
+    skip: int = 0, limit: int = 20,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     resumes = crud_resumes.get_resumes_by_user_id(db=db, user_id=current_user.id, skip=skip, limit=limit)
     return resumes
 
@@ -38,7 +42,8 @@ def get_resumes_from_current_user(skip: int = 0, limit: int = 20, current_user: 
 def get_resumes_by_batch_id(
     batch_id: str, skip: int = 0, limit: int = 20, 
     current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)):
+    db: Session = Depends(get_db)
+):
     if not crud_constraints.batch_exists_and_belongs_to_user(db, user_id=current_user.id, batch_id=batch_id):
         raise HTTPException(status_code=404, detail=f'batch "{batch_id}" does not exist')
     

@@ -4,6 +4,7 @@ from app.schemas import user as user_schema
 from app.crud import users as crud_users
 from tests.api_v1.conftest import TestClient, api_v1_config
 
+
 PREFIX = api_v1_config.PREFIX + '/auth'
 
 def test_login(client: TestClient, db_session: Session):

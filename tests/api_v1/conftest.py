@@ -5,8 +5,12 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 
+from app.models import User
+from app.schemas import user as schemas_users
+from app.crud import users as crud_users
+from app.auth.token import get_current_user
 from app.db.database import Base
 from app.db.dependency import get_db
 from app.core.config import settings
@@ -69,3 +73,27 @@ def client(app: FastAPI, db_session: SessionTesting) -> Generator[TestClient, An
     app.dependency_overrides[get_db] = get_test_db
     with TestClient(app) as client:
         yield client
+
+@pytest.fixture(scope='function')
+def generic_user(db_session: Session) -> Generator[User, Any, None]:
+    user = schemas_users.UserCreate(
+        username='generic_user', email='generic@email.com', password='generic_password'
+    )
+    db_user = crud_users.create_user(db_session, user)
+    yield db_user
+
+@pytest.fixture(scope='function')
+def second_generic_user(db_session: Session) -> Generator[User, Any, None]:
+    user = schemas_users.UserCreate(
+        username='generic_second_user', email='generic_second_user@email.com', password='generic_password'
+    )
+    db_user = crud_users.create_user(db_session, user)
+    yield db_user
+
+@pytest.fixture(scope='function')
+def current_user(app: FastAPI, generic_user: User) -> Generator[User, Any, None]:
+    def get_test_current_user():
+        return generic_user
+
+    app.dependency_overrides[get_current_user] = get_test_current_user
+    return get_test_current_user()
