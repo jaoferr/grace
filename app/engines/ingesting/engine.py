@@ -1,6 +1,7 @@
 import os
 from tika import parser
 from io import BytesIO
+from typing import Generator, Any
 
 from unidecode import unidecode
 import string
@@ -54,3 +55,6 @@ class IngestingEngine:
             'content': data
         }
         return result
+
+def get_engine() -> Generator[IngestingEngine, Any, None]:
+    yield IngestingEngine()

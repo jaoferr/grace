@@ -2,17 +2,18 @@ import csv
 import os
 from datetime import datetime
 from tempfile import NamedTemporaryFile
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, BackgroundTasks, Form
 from sqlalchemy.orm import Session
 from bson.objectid import ObjectId
 from app import models, schemas
 from app.crud import resumes as crud_resumes
 from app.crud import constraints as crud_constraints
 from app.tasks import ingest
-from app.dependencies import TikaServer
+from app.dependencies import get_tika_status
 from app.core.config import settings
 from app.db.dependency import get_db
 from app.auth.token import get_current_user
+from app.engines.ingesting.engine import get_engine, IngestingEngine
 from app.routers.api_v1.config import Config
 
 
@@ -50,16 +51,17 @@ def get_resumes_by_batch_id(
     resumes = crud_resumes.get_resumes_by_batch_id(db, skip=skip, limit=limit, batch_id=batch_id)
     return resumes
 
-from fastapi import Form
 @router.post('/ingest', status_code=202)
 async def ingest_resume(
-    file: UploadFile, background_tasks: BackgroundTasks,
+    background_tasks: BackgroundTasks,
+    file: UploadFile, 
     tag: str = Form(...),
     current_user: models.User = Depends(get_current_user),
+    engine: IngestingEngine = Depends(get_engine),
+    tika_status: bool = Depends(get_tika_status),
     db: Session = Depends(get_db)
 ):
-    is_tika_running = TikaServer.check_server()
-    if not is_tika_running:
+    if not tika_status:
         raise HTTPException(503, detail='ingest endpoint is not available')
 
     file_size: int = settings.Hardcoded.MAX_ZIP_FILE_SIZE
@@ -77,9 +79,10 @@ async def ingest_resume(
 
     batch_id = str(ObjectId())
     background_tasks.add_task(
-        ingest.launch_task, file=temp_file,
-        user=current_user, batch_id=batch_id,
-        db=db, tag=tag # .tag
+        ingest.launch_task,
+        file=temp_file, user=current_user,
+        batch_id=batch_id, tag=tag,
+        engine=engine, db=db
     )
     await file.close()
 

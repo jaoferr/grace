@@ -16,14 +16,18 @@ def is_file_allowed(filename: str):
 def update_progress(task_id: ObjectId, progress: int):
     pass
 
-def task(raw_file: BufferedRandom, user: models.User, batch_id: str, tag: str, db: Session):
+def task(
+    raw_file: BufferedRandom, user: models.User, 
+    batch_id: str, tag: str, 
+    engine: IngestingEngine, db: Session
+):
     tag = tags.create_tag(
         db, ResumeTagCreate(user_id=user.id, tag=tag)
     )
     batch = batches.create_batch(
         db, BatchCreate(id=batch_id, user_id=user.id)
     )
-    engine = IngestingEngine()
+    # engine = IngestingEngine()
     zip = ZipFile(raw_file)
     for file in zip.namelist():
         if is_file_allowed(file):
@@ -41,7 +45,11 @@ def task(raw_file: BufferedRandom, user: models.User, batch_id: str, tag: str, d
             )
     logger.info(f'Done processing batch {batch_id}')
 
-def launch_task(file: _TemporaryFileWrapper, user: models.User, batch_id: str, tag: str, db: Session):
+def launch_task(
+    file: _TemporaryFileWrapper, user: models.User, 
+    batch_id: str, tag: str, 
+    engine: IngestingEngine, db: Session
+):
     ''' add to queue '''
-    task(file, user, batch_id, tag, db)
+    task(file, user, batch_id, tag, engine, db)
     file.close()

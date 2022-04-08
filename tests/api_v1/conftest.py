@@ -11,6 +11,7 @@ from app.models import User
 from app.schemas import user as schemas_users
 from app.crud import users as crud_users
 from app.auth.token import get_current_user
+from app.dependencies import get_tika_status
 from app.db.database import Base
 from app.db.dependency import get_db
 from app.core.config import settings
@@ -97,3 +98,10 @@ def current_user(app: FastAPI, generic_user: User) -> Generator[User, Any, None]
 
     app.dependency_overrides[get_current_user] = get_test_current_user
     return get_test_current_user()
+
+@pytest.fixture(scope='function')
+def tika_status_false(app: FastAPI):
+    def fake_tika_status():
+        return False
+
+    app.dependency_overrides[get_tika_status] = fake_tika_status

@@ -21,3 +21,6 @@ class TikaServer:
             logger.warn('Unknown error. Ingestion endpoints will not work.')
             logger.warn(e)
             return False
+
+def get_tika_status() -> bool:
+    return TikaServer.check_server()
