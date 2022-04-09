@@ -10,8 +10,8 @@ from sqlalchemy.orm import Session
 
 from app import schemas
 from app.auth.config import auth_settings
-from app.crud.users import get_user_by_username
 from app.db.dependency import get_db
+from app.routers.api_v1.config import Config
 
 
 class Token(BaseModel):
@@ -25,7 +25,7 @@ class TokenData(BaseModel):
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
-from app.routers.api_v1.config import Config
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=Config.PREFIX + '/auth/login')
 
@@ -34,6 +34,9 @@ def verify_password(plain_password: str, hashed_password: str):
 
 def get_password_hash(password: str):
     return pwd_context.hash(password)
+
+from app.crud.users import get_user_by_username
+
 
 def authenticate_user(db: Session, username: str, password: str):
     user = get_user_by_username(db, username)

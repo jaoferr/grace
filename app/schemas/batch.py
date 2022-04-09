@@ -3,7 +3,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from app import schemas
+from app.schemas import Resume
 
 
 class BatchBase(BaseModel):
@@ -18,7 +18,7 @@ class BatchCreate(BatchBase):
 class Batch(BatchBase):
     timestamp: datetime
     item_count: int
-    resumes: List[schemas.Resume]
+    resumes: List[Resume]
 
     class Config:
         orm_mode = True
