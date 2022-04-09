@@ -1,14 +1,11 @@
-from typing import Optional, Dict, Any, List
-from pydantic import BaseModel
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel
 
 
 class ResumeBase(BaseModel):
     object_id: str
-
-
-class ResumeCreateExternal(BaseModel):
-    tag: str
 
 
 class ResumeCreate(ResumeBase):

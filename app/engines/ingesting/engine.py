@@ -1,10 +1,13 @@
-from tika import parser
-from io import BytesIO
-
-from unidecode import unidecode
-import string
+import os
 import re
+import string
+from io import BytesIO
+from typing import Any, Generator
+
+import nltk
 from nltk.corpus import stopwords
+from tika import parser
+from unidecode import unidecode
 
 from app.dependencies import TikaServer
 
@@ -37,6 +40,10 @@ class IngestingEngine:
 
     TIKA_SERVER_ENDPOINT = TikaServer.ENDPOINT
 
+    def __init__(self) -> None:
+        if not os.path.exists('/stopwords'):
+            nltk.download('stopwords')
+
     @classmethod
     def process_file(cls, file_bytes: BytesIO):
         ''' Process "any" file with tika '''
@@ -48,3 +55,6 @@ class IngestingEngine:
             'content': data
         }
         return result
+
+def get_engine() -> Generator[IngestingEngine, Any, None]:
+    yield IngestingEngine()

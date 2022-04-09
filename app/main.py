@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.core.config import settings
-from app.routers.api_v1 import users, main, resumes, auth, jobs, recommendation
+from app.routers.api_v1 import auth, jobs, main, recommendation, resumes, users
 
 
 def get_application():
@@ -34,7 +35,10 @@ app = get_application()
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+
 from app.core.logging import logger
+
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     exc_str = f'{exc}'.replace('\n', ' ').replace('   ', ' ')

@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine
+from sqlalchemy import exc as sql_exc
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import exc as sql_exc
+
 from app.core.config import SQLSettings
 from app.core.logging import logger
 

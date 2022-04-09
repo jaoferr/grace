@@ -1,16 +1,23 @@
+import os
 import re
-import nltk
-import Levenshtein
 from collections import Counter
 from typing import Callable
-from sklearn.metrics.pairwise import cosine_similarity as sklearn_cosine_similarity
+
+import Levenshtein
+import nltk
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity as sklearn_cosine_similarity
+
 from app.schemas.recommendation import Recommendation
+
 
 class RecommendingEngine:
 
     def __init__(self, weighted_methods: dict[str: float]) -> None:
         self.weighted_methods = self.init_methods(weighted_methods)
+
+        if not os.path.exists('/stopwords'):
+            nltk.download('punkt')
 
     class Methods:
 

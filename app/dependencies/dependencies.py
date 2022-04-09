@@ -1,6 +1,8 @@
 import requests
+
 from app.core.config import settings
 from app.core.logging import logger
+
 
 class TikaServer:
 
@@ -21,3 +23,6 @@ class TikaServer:
             logger.warn('Unknown error. Ingestion endpoints will not work.')
             logger.warn(e)
             return False
+
+def get_tika_status() -> bool:
+    return TikaServer.check_server()

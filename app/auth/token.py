@@ -1,14 +1,16 @@
-from pydantic import BaseModel
+from datetime import datetime, timedelta
 from typing import Optional
+
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi.security import OAuth2PasswordBearer
-from fastapi import Depends
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
-from app.crud.users import get_user_by_username
-from app.auth.config import auth_settings
+
 from app import schemas
+from app.auth.config import auth_settings
+from app.crud.users import get_user_by_username
 from app.db.dependency import get_db
 
 
@@ -24,6 +26,7 @@ class TokenData(BaseModel):
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 from app.routers.api_v1.config import Config
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=Config.PREFIX + '/auth/login')
 
 def verify_password(plain_password: str, hashed_password: str):

@@ -1,7 +1,9 @@
-from pydantic import BaseSettings
-from secrets import token_bytes
 from base64 import b64encode
+from secrets import token_bytes
+
 from fastapi import HTTPException
+from pydantic import BaseSettings
+
 
 class AuthSettings(BaseSettings):
 

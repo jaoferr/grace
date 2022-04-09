@@ -1,6 +1,4 @@
 from pydantic import BaseModel
-from typing import List
-from .resume_tag import ResumeTag
 
 
 class UserBase(BaseModel):

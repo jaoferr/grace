@@ -1,5 +1,6 @@
 import os
 from typing import List, Optional, Union
+
 from pydantic import AnyHttpUrl, BaseSettings, validator
 from sqlalchemy.engine.url import URL
 

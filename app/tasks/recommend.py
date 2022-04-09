@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app import models, schemas
 from app.engines.recommendation.engine import RecommendingEngine
 
+
 def list_scoring_methods(engine: RecommendingEngine = RecommendingEngine):
     return {'methods': list(engine.Methods.available_methods.all.keys())}
 
