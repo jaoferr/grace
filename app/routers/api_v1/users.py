@@ -1,10 +1,10 @@
-from app.routers.api_v1.config import Config
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.crud import users as crud_users
-from app import schemas
-from app.db.dependency import get_db
 
+from app import schemas
+from app.crud import users as crud_users
+from app.db.dependency import get_db
+from app.routers.api_v1.config import Config
 
 router = APIRouter(
     prefix=Config.PREFIX + '/users',

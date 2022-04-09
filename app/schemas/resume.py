@@ -1,7 +1,7 @@
-from typing import Optional, Dict, Any, List
-from pydantic import BaseModel, Field
 from datetime import datetime
-from fastapi import Form, UploadFile
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel
 
 
 class ResumeBase(BaseModel):

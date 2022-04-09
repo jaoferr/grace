@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
-from app.models import models
+
 from app import schemas
+from app.models import models
 
 
 def get_user(db: Session, user_id: int) -> models.User:
@@ -16,6 +17,8 @@ def get_users(db: Session, skip: int = 0, limit: int = 100) -> list[models.User]
     return db.query(models.User).offset(skip).limit(limit).all()
 
 from app.auth.token import get_password_hash
+
+
 def create_user(db: Session, user: schemas.UserCreate) -> models.User:
     db_user = models.User(
         # **user.dict()

@@ -1,8 +1,8 @@
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
-from app.schemas import user as user_schema
 from app.crud import users as crud_users
+from app.schemas import user as user_schema
 from tests.api_v1.conftest import TestClient, api_v1_config
 
 

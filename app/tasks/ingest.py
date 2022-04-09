@@ -1,14 +1,17 @@
+from io import BufferedRandom, BytesIO
 from tempfile import _TemporaryFileWrapper
-from io import BytesIO, BufferedRandom
 from zipfile import ZipFile
+
 from bson import ObjectId
 from sqlalchemy.orm import Session
+
 from app.core.config import settings
-from app.engines.ingesting.engine import IngestingEngine
-from app.schemas import ResumeCreate, ResumeTagCreate, BatchCreate
-from app.models import models
-from app.crud import resumes, tags, batches
 from app.core.logging import logger
+from app.crud import batches, resumes, tags
+from app.engines.ingesting.engine import IngestingEngine
+from app.models import models
+from app.schemas import BatchCreate, ResumeCreate, ResumeTagCreate
+
 
 def is_file_allowed(filename: str):
     return '.' in filename and filename.split('.')[-1].lower() in settings.Hardcoded.ALLOWED_EXTENSIONS

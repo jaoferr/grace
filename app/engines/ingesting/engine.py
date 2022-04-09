@@ -1,13 +1,13 @@
 import os
-from tika import parser
-from io import BytesIO
-from typing import Generator, Any
-
-from unidecode import unidecode
-import string
 import re
+import string
+from io import BytesIO
+from typing import Any, Generator
+
 import nltk
 from nltk.corpus import stopwords
+from tika import parser
+from unidecode import unidecode
 
 from app.dependencies import TikaServer
 

@@ -1,7 +1,7 @@
-from app.routers.api_v1.config import Config
 from fastapi import APIRouter
-from app.core.logging import logger
 
+from app.core.logging import logger
+from app.routers.api_v1.config import Config
 
 router = APIRouter(
     prefix=Config.PREFIX,

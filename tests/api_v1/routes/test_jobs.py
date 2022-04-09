@@ -1,11 +1,10 @@
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
+from app.crud import jobs as crud_jobs
 from app.models import User
 from app.schemas import jobs as jobs_schema
-from app.crud import jobs as crud_jobs
 from tests.api_v1.conftest import TestClient, api_v1_config
-
 
 PREFIX = api_v1_config.PREFIX + '/jobs'
 

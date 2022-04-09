@@ -1,12 +1,12 @@
 import os
 import pathlib
-from fastapi.encoders import jsonable_encoder
+
 from fastapi import UploadFile
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app.models import User
 from tests.api_v1.conftest import TestClient, api_v1_config
-
 
 PREFIX = api_v1_config.PREFIX + '/resumes'
 
@@ -70,8 +70,3 @@ def test_resume_tika_status(client: TestClient, current_user: User, tika_status_
 
     assert response.status_code == 503
     assert response_json.get('detail') == 'ingest endpoint is not available'
-
-
-def test_ingest_engine():
-    pass
-

@@ -2,20 +2,21 @@ import csv
 import os
 from datetime import datetime
 from tempfile import NamedTemporaryFile
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, BackgroundTasks, Form
-from sqlalchemy.orm import Session
-from bson.objectid import ObjectId
-from app import models, schemas
-from app.crud import resumes as crud_resumes
-from app.crud import constraints as crud_constraints
-from app.tasks import ingest
-from app.dependencies import get_tika_status
-from app.core.config import settings
-from app.db.dependency import get_db
-from app.auth.token import get_current_user
-from app.engines.ingesting.engine import get_engine, IngestingEngine
-from app.routers.api_v1.config import Config
 
+from bson.objectid import ObjectId
+from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, UploadFile
+from sqlalchemy.orm import Session
+
+from app import models, schemas
+from app.auth.token import get_current_user
+from app.core.config import settings
+from app.crud import constraints as crud_constraints
+from app.crud import resumes as crud_resumes
+from app.db.dependency import get_db
+from app.dependencies import get_tika_status
+from app.engines.ingesting.engine import IngestingEngine, get_engine
+from app.routers.api_v1.config import Config
+from app.tasks import ingest
 
 router = APIRouter(
     prefix=Config.PREFIX + '/resumes',

@@ -1,8 +1,10 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, JSON, Text
-from sqlalchemy.orm import relationship
-from sqlalchemy.ext.hybrid import hybrid_property
-from app.db.database import Base
 from datetime import datetime
+
+from sqlalchemy import JSON, Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship
+
+from app.db.database import Base
 
 
 class User(Base):

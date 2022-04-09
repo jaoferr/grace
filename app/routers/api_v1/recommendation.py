@@ -3,12 +3,11 @@ from sqlalchemy.orm import Session
 
 from app import models, schemas
 from app.auth.token import get_current_user
+from app.crud import jobs as crud_jobs
+from app.crud import resumes as crud_resumes
 from app.db.dependency import get_db
 from app.routers.api_v1.config import Config
 from app.tasks import recommend
-from app.crud import jobs as crud_jobs
-from app.crud import resumes as crud_resumes
-
 
 router = APIRouter(
     prefix=Config.PREFIX + '/recommend',

@@ -1,23 +1,22 @@
-from typing import Generator, Any
+from typing import Any, Generator
 
 import pytest
 from fastapi import FastAPI
-from fastapi.testclient import TestClient
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
 
-from app.models import User
-from app.schemas import user as schemas_users
-from app.crud import users as crud_users
 from app.auth.token import get_current_user
-from app.dependencies import get_tika_status
+from app.core.config import settings
+from app.crud import users as crud_users
 from app.db.database import Base
 from app.db.dependency import get_db
-from app.core.config import settings
-from app.routers.api_v1 import users, main, resumes, auth, jobs, recommendation
+from app.dependencies import get_tika_status
+from app.models import User
+from app.routers.api_v1 import auth, jobs, main, recommendation, resumes, users
 from app.routers.api_v1.config import Config as api_v1_config
-
+from app.schemas import user as schemas_users
 
 SQL_DATABASE_URI = 'sqlite://'
 engine = create_engine(
