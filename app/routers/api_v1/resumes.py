@@ -124,7 +124,8 @@ def get_resume(resume_id: int, db: Session = Depends(get_db)):
 def get_resumes_by_tag(
     tag: str, skip: int = 0, limit: int = 100,
     current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)):
+    db: Session = Depends(get_db)
+    ):
     if not crud_constraints.tag_exists_and_belongs_to_user(db, user_id=current_user.id, tag=tag):
         raise HTTPException(status_code=404, detail=f'tag "{tag}" does not exist')
     
@@ -132,3 +133,15 @@ def get_resumes_by_tag(
     tag.resumes = tag.resumes[skip:limit]
 
     return tag
+
+@router.post('/update', response_model=schemas.Resume)
+def update_resume(
+    resume: schemas.ResumeUpdate,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+    ) -> None:
+    if not crud_constraints.resume_exists_and_belongs_to_user(db, resume.id, current_user.id):
+        raise HTTPException(status_code=404, detail='resume does not exist')
+
+    db_resume = crud_resumes.update_resume(db, resume, current_user)
+    return db_resume

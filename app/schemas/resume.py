@@ -16,6 +16,12 @@ class ResumeCreate(ResumeBase):
     content: Dict[Any, Any]
 
 
+class ResumeUpdate(BaseModel):
+    id: int
+    tag_id: int
+    content: Optional[Dict[Any, Any]]
+
+
 class Resume(ResumeBase):
     id: int
     user_id: int

@@ -37,3 +37,17 @@ def get_resumes_by_tag_id(db: Session, tag_id: int, user_id: int):
         return None
 
     return db.query(models.Resume).filter(models.Resume.tag_id == tag_id).all()
+
+def delete_all_resumes(db: Session, skip: int = 0, limit: int = 5) -> int:
+    return db.query(models.Resume).delete()
+    
+def update_resume(db: Session, resume: schemas.ResumeUpdate, user: schemas.User) -> models.Resume:
+    db_resume = db.query(models.Resume).filter_by(id=resume.id, user_id=user.id).first()
+
+    for field, value in vars(resume).items():
+        setattr(db_resume, field, value) if value else None
+        
+    db.add(db_resume)
+    db.commit()
+    db.refresh(db_resume)
+    return db_resume
