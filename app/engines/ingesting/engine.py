@@ -41,8 +41,9 @@ class IngestingEngine:
     TIKA_SERVER_ENDPOINT = TikaServer.ENDPOINT
 
     def __init__(self) -> None:
-        if not os.path.exists('./venv/nltk_data/stopwords'):
-            nltk.download('stopwords', download_dir='./venv/nltk_data/')
+        # if not os.path.exists('./venv/nltk_data/stopwords'):
+            # nltk.download('stopwords', download_dir='./venv/')
+        nltk.download('stopwords')
 
     @classmethod
     def process_file(cls, file_bytes: BytesIO):
