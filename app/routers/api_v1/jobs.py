@@ -25,7 +25,7 @@ def get_jobs_from_current_user(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if not (jobs := crud_jobs.get_user_jobs(db, current_user.id)):
+    if not (jobs := crud_jobs.get_user_jobs(db, current_user.id, skip, limit)):
         raise HTTPException(status_code=404, detail=f'user has no jobs')
     return jobs
 

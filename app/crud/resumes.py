@@ -23,6 +23,9 @@ def get_resumes_by_user_id(db: Session, user_id: int, skip: int = 0, limit: int 
         .offset(skip).limit(limit).all()
 
 def create_resume(db: Session, resume: schemas.ResumeCreate):
+    if not constraints.tag_id_exists_and_belongs_to_user(db, resume.tag_id, resume.user_id):
+        return False
+
     db_resume = models.Resume(**resume.dict())
     db.add(db_resume)
     db.commit()
@@ -32,15 +35,15 @@ def create_resume(db: Session, resume: schemas.ResumeCreate):
 def get_resumes(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Resume).offset(skip).limit(limit).all()
 
-def get_resumes_by_tag_id(db: Session, tag_id: int, user_id: int):
-    if not constraints.tag_id_exists_and_belongs_to_user(db, tag_id, user_id):
-        return None
+def get_resumes_by_tag_id(db: Session, tag_id: int, user_id: int) -> Optional[list[models.Resume]]:
+    if resumes := (constraints.tag_id_exists_and_belongs_to_user(db, tag_id, user_id)):
+        return resumes
 
-    return db.query(models.Resume).filter(models.Resume.tag_id == tag_id).all()
+    return None
 
 def delete_all_resumes(db: Session, skip: int = 0, limit: int = 5) -> int:
-    return db.query(models.Resume).delete()
-    
+    return db.query(models.Resume).offset(skip).limit(limit).delete()
+
 def update_resume(db: Session, resume: schemas.ResumeUpdate, user: schemas.User) -> models.Resume:
     db_resume = db.query(models.Resume).filter_by(id=resume.id, user_id=user.id).first()
 
@@ -51,3 +54,6 @@ def update_resume(db: Session, resume: schemas.ResumeUpdate, user: schemas.User)
     db.commit()
     db.refresh(db_resume)
     return db_resume
+
+def delete_resume(db: Session, resume_id):
+    pass

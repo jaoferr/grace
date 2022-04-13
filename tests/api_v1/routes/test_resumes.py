@@ -19,7 +19,7 @@ def test_resume_ingest(client: TestClient, current_user: User):
     data = {
         'tag': 'test_tag'
     }
-    
+
     files = {
         'file': (test_filename, open(test_data_path, 'rb'), 'application/zip')
     }
@@ -40,7 +40,7 @@ def test_resume_ingest_invalid_file_type(client: TestClient, current_user: User)
     data = {
         'tag': 'test_tag'
     }
-    
+
     files = {
         'file': (test_filename, open(test_data_path, 'rb'), 'application/txt')
     }
@@ -60,7 +60,7 @@ def test_resume_tika_status(client: TestClient, current_user: User, tika_status_
     data = {
         'tag': 'test_tag'
     }
-    
+
     files = {
         'file': (test_filename, open(test_data_path, 'rb'), 'application/txt')
     }
@@ -83,8 +83,8 @@ def test_update_resume(client: TestClient, current_user: User, db_session: Sessi
         content={'content': 'this is a test resume'}
     )
     db_resume = crud_resumes.create_resume(db_session, resume)
-    resume_updates = resume_schema.ResumeUpdate(id=db_resume.id, tag_id=1, content={'content': 'new test content'})
-    
+    resume_updates = resume_schema.ResumeUpdate(id=db_resume.id, tag_id=db_tag.id, content={'content': 'new test content'})
+
     data = jsonable_encoder(resume_updates)
     response = client.post(
         url=PREFIX+'/update', json=data
@@ -95,5 +95,22 @@ def test_update_resume(client: TestClient, current_user: User, db_session: Sessi
     assert response_json.get('id') == resume_updates.id
     assert response_json.get('tag_id') == resume_updates.tag_id
 
-def test_update_resume_fail():
-    pass
+def test_update_resume_fail(client: TestClient, current_user: User, second_generic_user: User, db_session: Session):
+    tag = tag_schema.ResumeTagCreate(user_id=second_generic_user.id, tag='this is a test tag')
+    db_tag = crud_tags.create_tag(db_session, tag)
+    resume = resume_schema.ResumeCreate(
+        object_id='fakeobjectidfortestingx', 
+        user_id=second_generic_user.id, filename='filename.pdf',
+        batch_id='fakeobjectidfortestingx', tag_id=db_tag.id, 
+        content={'content': 'this is a test resume'}
+    )
+    db_resume = crud_resumes.create_resume(db_session, resume)
+    resume_updates = resume_schema.ResumeUpdate(id=db_resume.id, tag_id=db_tag.id, content={'content': 'new test content'})
+    
+    data = jsonable_encoder(resume_updates)
+    response = client.post(
+        url=PREFIX+'/update', json=data
+    )
+    response_json = response.json()
+    assert response.status_code == 404
+    assert response_json.get('detail') == 'resume does not exist'
