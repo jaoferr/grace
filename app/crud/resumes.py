@@ -42,7 +42,13 @@ def get_resumes_by_tag_id(db: Session, tag_id: int, user_id: int) -> Optional[li
     return None
 
 def delete_all_resumes(db: Session, skip: int = 0, limit: int = 5) -> int:
-    return db.query(models.Resume).offset(skip).limit(limit).delete()
+    try:
+        removed = db.query(models.Resume).offset(skip).limit(limit).delete()
+        db.commit()
+        db.refresh(removed)
+        return True
+    except:
+        return False
 
 def update_resume(db: Session, resume: schemas.ResumeUpdate, user: schemas.User) -> models.Resume:
     db_resume = db.query(models.Resume).filter_by(id=resume.id, user_id=user.id).first()
@@ -55,5 +61,7 @@ def update_resume(db: Session, resume: schemas.ResumeUpdate, user: schemas.User)
     db.refresh(db_resume)
     return db_resume
 
-def delete_resume(db: Session, resume_id):
-    pass
+def delete_resume(db: Session, resume: models.Resume):
+    db.delete(resume)
+    db.commit()
+    return resume.object_id

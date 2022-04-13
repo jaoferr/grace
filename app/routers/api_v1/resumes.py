@@ -145,3 +145,21 @@ def update_resume(
 
     db_resume = crud_resumes.update_resume(db, resume, current_user)
     return db_resume
+
+@router.post('/delete', response_model=schemas.ResumeDelete)
+def delete_resume(
+    resume_id: int,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+) -> None:
+    if not (resume := (crud_constraints.resume_exists_and_belongs_to_user(db, resume_id, current_user.id))):
+        raise HTTPException(status_code=404, detail='resume does not exist')
+
+    if not crud_constraints.tag_id_exists_and_belongs_to_user(db, resume.tag_id, current_user.id):
+        raise HTTPException(status_code=404, detail='tag does not exist')
+
+    try:
+        removed = crud_resumes.delete_resume(db, resume)
+        return {'object_id': removed, 'success': True}
+    except:
+        return {'success': False}
