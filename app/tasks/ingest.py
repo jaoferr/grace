@@ -30,7 +30,7 @@ def task(
     batch = batches.create_batch(
         db, BatchCreate(id=batch_id, user_id=user.id)
     )
-    # engine = IngestingEngine()
+
     zip = ZipFile(raw_file)
     for file in zip.namelist():
         if is_file_allowed(file):

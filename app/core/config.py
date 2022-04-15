@@ -14,6 +14,7 @@ class Settings(BaseSettings):
      Pydantic will read the environment variables in a case-insensitive way [...]"
     '''
     PROJECT_NAME: str
+    PROJECT_VERSION: str
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []   
 
     @validator("BACKEND_CORS_ORIGINS", pre=True)
