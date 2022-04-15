@@ -12,22 +12,10 @@ from unidecode import unidecode
 from app.dependencies import TikaServer
 
 
-class ResumeObject:
-
-    def __init__(self, filename: str, content: str, content_id: str, batch_id: str):
-        self.filename = filename
-        self.content = content
-        self.content_id = content_id  # hash from file content
-        self.batch_id = batch_id
-
-    def dict(self):
-        return vars(self)
-
-
 def basic_clean_up(text: str) -> str:
     text = unidecode(text)
     text = text.lower() \
-        .replace('\n', '') \
+        .replace('\n', ' ') \
         .strip() \
         .translate(str.maketrans('', '', string.punctuation))
     clean_up_pattern = re.compile(r'\b{}\b'.format(r'\b|\b'.join(stopwords.words())))  # removes stopwords

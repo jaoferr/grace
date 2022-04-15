@@ -25,7 +25,7 @@ def test_resume_ingest(client: TestClient, current_user: User):
     }
 
     response = client.post(
-        url=PREFIX + '/ingest', data=data, files=files
+        url=PREFIX + '.ingest', data=data, files=files
     )
     response_json = response.json()
 
@@ -46,7 +46,7 @@ def test_resume_ingest_invalid_file_type(client: TestClient, current_user: User)
     }
 
     response = client.post(
-        url=PREFIX + '/ingest', data=data, files=files
+        url=PREFIX + '.ingest', data=data, files=files
     )
     response_json = response.json()
 
@@ -66,7 +66,7 @@ def test_resume_tika_status(client: TestClient, current_user: User, tika_status_
     }
 
     response = client.post(
-        url=PREFIX + '/ingest', data=data, files=files
+        url=PREFIX + '.ingest', data=data, files=files
     )
     response_json = response.json()
 
@@ -87,7 +87,7 @@ def test_update_resume(client: TestClient, current_user: User, db_session: Sessi
 
     data = jsonable_encoder(resume_updates)
     response = client.post(
-        url=PREFIX+'/update', json=data
+        url=PREFIX + '.update', json=data
     )
     response_json = response.json()
     assert response.status_code == 200
@@ -109,7 +109,7 @@ def test_update_resume_fail(client: TestClient, current_user: User, second_gener
     
     data = jsonable_encoder(resume_updates)
     response = client.post(
-        url=PREFIX+'/update', json=data
+        url=PREFIX + '.update', json=data
     )
     response_json = response.json()
     assert response.status_code == 404
@@ -128,7 +128,7 @@ def test_delete_resume(client: TestClient, current_user: User, second_generic_us
     
 
     response = client.post(
-        url=PREFIX+'/delete', params={'resume_id': db_resume.id}
+        url=PREFIX + '.delete', params={'resume_id': db_resume.id}
     )
     response_json = response.json()
     assert response.status_code == 200
@@ -148,7 +148,7 @@ def test_delete_resume_fail(client: TestClient, current_user: User, second_gener
     
 
     response = client.post(
-        url=PREFIX+'/delete', params={'resume_id': db_resume.id}
+        url=PREFIX + '.delete', params={'resume_id': db_resume.id}
     )
     response_json = response.json()
     assert response.status_code == 404

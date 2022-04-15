@@ -18,7 +18,7 @@ router = APIRouter(
 )
 
 
-@router.post('/make', response_model=list[schemas.Recommendation])
+@router.post('.make', response_model=list[schemas.Recommendation])
 def make_recommendation(
     recommendation_request: schemas.RecommendationRequest,
     current_user: models.User = Depends(get_current_user),
@@ -37,6 +37,6 @@ def make_recommendation(
 
     return results
 
-@router.get('/scoring_methods')
+@router.get('.get_scoring_methods')
 def list_scoring_methods():
     return recommend.list_scoring_methods()

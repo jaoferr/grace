@@ -14,7 +14,7 @@ def test_login(client: TestClient, db_session: Session):
 
     data = {'username': db_user.username, 'password': 'testpassword'}
     response = client.post(
-        url=PREFIX + '/login', data=data
+        url=PREFIX + '.login', data=data
     )
     response_json = response.json()
 
@@ -31,7 +31,7 @@ def test_login_incorrect_password(client: TestClient, db_session: Session):
 
     data = {'username': db_user.username, 'password': 'wrongtestpassword'}
     response = client.post(
-        url=PREFIX + '/login', data=data
+        url=PREFIX + '.login', data=data
     )
     response_json = response.json()
 
@@ -46,14 +46,14 @@ def test_get_me(client: TestClient, db_session: Session):
 
     data = {'username': db_user.username, 'password': 'testpassword'}
     login_response = client.post(
-        url=PREFIX + '/login', data=data
+        url=PREFIX + '.login', data=data
     ).json()
     
     headers = {
         'Authorization': f'{login_response.get("token_type")} {login_response.get("access_token")}'
     }
     me_response = client.get(
-        url=PREFIX + '/me', headers=headers
+        url=PREFIX + '.me', headers=headers
     )
     me_response_json = me_response.json()
 
