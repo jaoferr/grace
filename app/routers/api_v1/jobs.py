@@ -15,21 +15,21 @@ router = APIRouter(
     }
 )
 
-@router.get('/all', response_model=list[schemas.Job])
+@router.get('.all', response_model=list[schemas.Job])
 def get_all_jobs(db: Session = Depends(get_db)):
     return db.query(models.Jobs).all()
 
-@router.get('/from_current_user', response_model=list[schemas.Job])
+@router.get('.from_current_user', response_model=list[schemas.Job])
 def get_jobs_from_current_user(
     skip: int = 0, limit: int = 20,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if not (jobs := crud_jobs.get_user_jobs(db, current_user.id)):
+    if not (jobs := crud_jobs.get_user_jobs(db, current_user.id, skip, limit)):
         raise HTTPException(status_code=404, detail=f'user has no jobs')
     return jobs
 
-@router.post('/create', response_model=schemas.Job)
+@router.post('.create', response_model=schemas.Job)
 def create_job(
     job: schemas.JobCreateExternal, 
     current_user: models.User = Depends(get_current_user),
@@ -43,7 +43,7 @@ def create_job(
 
     return db_job
 
-@router.get('', response_model=schemas.Job)
+@router.get('.get_by_id', response_model=schemas.Job)
 def get_job_by_id(
     job_id: int, db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)

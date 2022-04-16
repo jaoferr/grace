@@ -16,8 +16,8 @@ class RecommendingEngine:
     def __init__(self, weighted_methods: dict[str: float]) -> None:
         self.weighted_methods = self.init_methods(weighted_methods)
 
-        if not os.path.exists('/stopwords'):
-            nltk.download('punkt')
+        if not os.path.exists('./venv/nltk_data/punkt'):
+            nltk.download('punkt', download_dir='./venv/nltk_data/')
 
     class Methods:
 

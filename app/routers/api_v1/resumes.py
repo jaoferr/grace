@@ -26,12 +26,12 @@ router = APIRouter(
     }
 )
 
-@router.get('/from_user/{user_id}', response_model=list[schemas.Resume])
+@router.get('.from_user/{user_id}', response_model=list[schemas.resume.Resume])
 def get_resumes_from_user(user_id: int, skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
     resumes = crud_resumes.get_resumes_by_user_id(db, user_id, skip=skip, limit=limit)
     return resumes
 
-@router.get('/from_current_user/', response_model=list[schemas.Resume])
+@router.get('.from_current_user', response_model=list[schemas.resume.Resume])
 def get_resumes_from_current_user(
     skip: int = 0, limit: int = 20,
     current_user: models.User = Depends(get_current_user),
@@ -40,19 +40,18 @@ def get_resumes_from_current_user(
     resumes = crud_resumes.get_resumes_by_user_id(db=db, user_id=current_user.id, skip=skip, limit=limit)
     return resumes
 
-@router.get('/from_batch/{batch_id}', response_model=list[schemas.Resume])
+@router.get('.from_batch/{batch_id}', response_model=list[schemas.resume.Resume])
 def get_resumes_by_batch_id(
     batch_id: str, skip: int = 0, limit: int = 20, 
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if not crud_constraints.batch_exists_and_belongs_to_user(db, user_id=current_user.id, batch_id=batch_id):
+    if not (resumes := (crud_constraints.batch_exists_and_belongs_to_user(db, user_id=current_user.id, batch_id=batch_id))):
         raise HTTPException(status_code=404, detail=f'batch "{batch_id}" does not exist')
     
-    resumes = crud_resumes.get_resumes_by_batch_id(db, skip=skip, limit=limit, batch_id=batch_id)
     return resumes
 
-@router.post('/ingest', status_code=202)
+@router.post('.ingest', status_code=202)
 async def ingest_resume(
     background_tasks: BackgroundTasks,
     file: UploadFile, 
@@ -89,7 +88,7 @@ async def ingest_resume(
 
     return {'detail': 'task was added to queue', 'batch_id': batch_id}
 
-@router.get('/export/', status_code=202)
+@router.get('.export', status_code=202)
 def export_resumes(current_user: models.User = Depends(get_current_user)):
     resumes: list[models.Resume] = current_user.resumes
     export_time = str(datetime.utcnow()).replace(" ", "_").replace(':', '-')
@@ -113,22 +112,61 @@ def export_resumes(current_user: models.User = Depends(get_current_user)):
 
     return {'detail': f'exported user "{current_user.username}" resumes to {filepath}'}
 
-@router.get('/{resume_id}', response_model=schemas.Resume)
+# @router.get('/{resume_id}', response_model=schemas.Resume)
+@router.get('.get_by_id', response_model=schemas.Resume)
 def get_resume(resume_id: int, db: Session = Depends(get_db)):
     resume = crud_resumes.get_resume(db, resume_id)
     if resume is None:
         raise HTTPException(404, 'User not found')
     return resume
 
-@router.get('/tag/{tag}', response_model=schemas.ResumeTag)
+@router.get('.tag/{tag}', response_model=schemas.ResumeTag)
 def get_resumes_by_tag(
     tag: str, skip: int = 0, limit: int = 100,
     current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)):
-    if not crud_constraints.tag_exists_and_belongs_to_user(db, user_id=current_user.id, tag=tag):
+    db: Session = Depends(get_db)
+    ):
+    if not (tag := (crud_constraints.tag_exists_and_belongs_to_user(db, user_id=current_user.id, tag=tag))):
         raise HTTPException(status_code=404, detail=f'tag "{tag}" does not exist')
-    
-    tag = db.query(models.ResumeTag).filter_by(tag=tag, user_id=current_user.id).first()
-    tag.resumes = tag.resumes[skip:limit]
 
+    tag.resumes = tag.resumes[skip:limit]
     return tag
+
+@router.post('.update', response_model=schemas.Resume)
+def update_resume(
+    resume: schemas.ResumeUpdate,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+    ) -> None:
+    if not crud_constraints.resume_exists_and_belongs_to_user(db, resume.id, current_user.id):
+        raise HTTPException(status_code=404, detail='resume does not exist')
+
+    if not crud_constraints.tag_id_exists_and_belongs_to_user(db, resume.tag_id, current_user.id):
+        raise HTTPException(status_code=404, detail='tag does not exist')
+
+    db_resume = crud_resumes.update_resume(db, resume, current_user)
+    return db_resume
+
+@router.post('.delete', response_model=schemas.ResumeDelete)
+def delete_resume(
+    resume_id: int,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+) -> None:
+    if not (resume := (crud_constraints.resume_exists_and_belongs_to_user(db, resume_id, current_user.id))):
+        raise HTTPException(status_code=404, detail='resume does not exist')
+
+    if not crud_constraints.tag_id_exists_and_belongs_to_user(db, resume.tag_id, current_user.id):
+        raise HTTPException(status_code=404, detail='tag does not exist')
+
+    try:
+        removed = crud_resumes.delete_resume(db, resume)
+        return {'object_id': removed, 'success': True}
+    except:
+        return {'success': False}
+
+@router.post('.delete_all')
+def delete_all_resumes(db: Session = Depends(get_db)):
+    if crud_resumes.delete_all_resumes(db):
+        return {'success': True}
+    return {'success': False}

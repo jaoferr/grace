@@ -14,19 +14,19 @@ router = APIRouter(
     }
 )
 
-@router.get('/all', response_model=list[schemas.User])
+@router.get('.get_all', response_model=list[schemas.User])
 def get_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = crud_users.get_users(db, skip=skip, limit=limit)
     return users
 
-@router.get('', response_model=schemas.User)
+@router.get('.get_by_id', response_model=schemas.User)
 def get_user(user_id: int, db: Session = Depends(get_db)):
     user = crud_users.get_user(db, user_id=user_id)
     if user is None:
         raise HTTPException(404, 'User not found')
     return user
 
-@router.post('/', response_model=schemas.User)
+@router.post('.create', response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud_users.get_user_by_email(db, user.email)
     if db_user:

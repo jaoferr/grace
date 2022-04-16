@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 
 class ResumeBase(BaseModel):
-    object_id: str
+    object_id: Optional[str]
 
 
 class ResumeCreate(ResumeBase):
@@ -14,6 +14,17 @@ class ResumeCreate(ResumeBase):
     batch_id: str
     tag_id: int
     content: Dict[Any, Any]
+    file: bytes
+
+
+class ResumeUpdate(BaseModel):
+    id: int
+    tag_id: int
+    content: Optional[Dict[Any, Any]]
+
+
+class ResumeDelete(ResumeBase):
+    success: bool
 
 
 class Resume(ResumeBase):

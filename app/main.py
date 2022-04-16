@@ -6,7 +6,7 @@ from app.routers.api_v1 import auth, jobs, main, recommendation, resumes, users
 
 
 def get_application():
-    _app = FastAPI(title=settings.PROJECT_NAME, version='0.2.0')
+    _app = FastAPI(title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION)
 
     _app.add_middleware(
         CORSMiddleware,

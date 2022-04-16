@@ -13,7 +13,7 @@ def test_create_job(client: TestClient, current_user: User):
     job = jobs_schema.JobCreateExternal(description='test job description')
     data = jsonable_encoder(job)
     response = client.post(
-        url=PREFIX + '/create', json=data
+        url=PREFIX + '.create', json=data
     )
     response_json = response.json()
     
@@ -29,7 +29,7 @@ def test_create_job_fail(client: TestClient, current_user: User, db_session: Ses
 
     data = jsonable_encoder(job)
     response = client.post(
-        url=PREFIX + '/create', json=data
+        url=PREFIX + '.create', json=data
     )
     response_json = response.json()
     
@@ -45,7 +45,7 @@ def test_get_job_fail(
     db_job = crud_jobs.create_job(db_session, job)
 
     response = client.get(
-        url=PREFIX, params={'job_id': db_job.id}
+        url=PREFIX + '.get_by_id', params={'job_id': db_job.id}
     )
     
     assert response.status_code == 404
@@ -60,7 +60,7 @@ def test_get_current_user_jobs(
         db_job = crud_jobs.create_job(db_session, job)
         
     response = client.get(
-        url=PREFIX + '/from_current_user'
+        url=PREFIX + '.from_current_user'
     )
     response_json = response.json()
     
