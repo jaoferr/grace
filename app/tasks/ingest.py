@@ -43,7 +43,8 @@ def task(
                 ResumeCreate(
                     user_id=user.id, filename=file,
                     batch_id=batch.id, content=content,
-                    object_id=resume_object_id, tag_id=tag.id
+                    object_id=resume_object_id, tag_id=tag.id,
+                    file=zip_bytes
                 )
             )
     logger.info(f'Done processing batch {batch_id}')

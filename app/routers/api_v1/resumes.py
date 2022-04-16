@@ -164,3 +164,9 @@ def delete_resume(
         return {'object_id': removed, 'success': True}
     except:
         return {'success': False}
+
+@router.post('.delete_all')
+def delete_all_resumes(db: Session = Depends(get_db)):
+    if crud_resumes.delete_all_resumes(db):
+        return {'success': True}
+    return {'success': False}
