@@ -1,4 +1,5 @@
 from typing import Optional
+import shutil
 
 from sqlalchemy.orm import Session
 
@@ -58,6 +59,7 @@ def update_resume(db: Session, resume: schemas.ResumeUpdate, user: schemas.User)
     return db_resume
 
 def delete_resume(db: Session, resume: models.Resume):
+    shutil.rmtree(resume.filename)
     db.delete(resume)
     db.commit()
     return resume.object_id

@@ -1,9 +1,8 @@
 from datetime import datetime
 
-from sqlalchemy import JSON, Column, DateTime, ForeignKey, Integer, String, Text, LargeBinary
+from sqlalchemy import JSON, Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.mysql import MEDIUMBLOB
 
 from app.db.database import Base
 
@@ -37,7 +36,6 @@ class Resume(Base):
     batch_id = Column(String(24), ForeignKey('batch.id'))
     content = Column(JSON)
     tag_id = Column(Integer, ForeignKey('resumetag.id'))
-    file = Column(LargeBinary().with_variant(MEDIUMBLOB, 'mysql'))
 
     owner = relationship('User', back_populates='resumes')
     batch = relationship('Batch', back_populates='resumes')

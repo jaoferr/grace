@@ -1,5 +1,6 @@
 import csv
 import os
+import glob
 from datetime import datetime
 from tempfile import NamedTemporaryFile
 
@@ -112,7 +113,6 @@ def export_resumes(current_user: models.User = Depends(get_current_user)):
 
     return {'detail': f'exported user "{current_user.username}" resumes to {filepath}'}
 
-# @router.get('/{resume_id}', response_model=schemas.Resume)
 @router.get('.get_by_id', response_model=schemas.Resume)
 def get_resume(resume_id: int, db: Session = Depends(get_db)):
     resume = crud_resumes.get_resume(db, resume_id)

@@ -14,7 +14,6 @@ class ResumeCreate(ResumeBase):
     batch_id: str
     tag_id: int
     content: Dict[Any, Any]
-    file: bytes
 
 
 class ResumeUpdate(BaseModel):
