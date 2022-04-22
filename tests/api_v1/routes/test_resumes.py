@@ -126,8 +126,7 @@ def test_delete_resume(client: TestClient, current_user: User, second_generic_us
         object_id='fakeobjectidfortestingx', 
         user_id=current_user.id, filename='filename.pdf',
         batch_id='fakeobjectidfortestingx', tag_id=db_tag.id, 
-        content={'content': 'this is a test resume'},
-        file=b'testbytes'
+        content={'content': 'this is a test resume'}
     )
     db_resume = crud_resumes.create_resume(db_session, resume)
     

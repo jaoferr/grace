@@ -35,11 +35,11 @@ def verify_password(plain_password: str, hashed_password: str):
 def get_password_hash(password: str):
     return pwd_context.hash(password)
 
-from app.crud.users import get_user_by_username
+from app.crud import users as crud_users
 
 
 def authenticate_user(db: Session, username: str, password: str):
-    user = get_user_by_username(db, username)
+    user = crud_users.get_user_by_username(db, username)
     if not user:
         return False
     if not verify_password(password, user.password_hash):
@@ -65,11 +65,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         token_data = TokenData(username=username)
     except JWTError:
         raise auth_settings.Exceptions.CREDENTIALS
-    user = get_user_by_username(db, username=token_data.username)
+    user = crud_users.get_user_by_username(db, username=token_data.username)
     if user is None:
         raise auth_settings.Exceptions.CREDENTIALS
     return user
-
-# async def get_current_active_user(current_user: User = Depends(get_current_user)):
-#     if current_user.disabled:
-#         raise auth_settings.Exceptions.DISABLED

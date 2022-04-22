@@ -7,8 +7,9 @@ from app import models, schemas
 from app.crud import constraints
 
 
-def get_resume(db: Session, id: Optional[int] = None):
-    return db.query(models.Resume).filter(models.Resume.id == id).first()
+def get_resume(db: Session, id: Optional[int] = None, user_id: Optional[int] = None):
+    if resume := constraints.resume_exists_and_belongs_to_user(db, id, user_id):
+        return resume
 
 def get_resume_by_object_id(db: Session, object_id: Optional[int] = None):
     return db.query(models.Resume).filter(models.Resume.object_id == object_id).first()
