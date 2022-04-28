@@ -1,3 +1,4 @@
+import os
 from io import BufferedRandom, BytesIO
 from tempfile import _TemporaryFileWrapper
 from zipfile import ZipFile
@@ -31,22 +32,29 @@ def task(
         db, BatchCreate(id=batch_id, user_id=user.id)
     )
 
+    batch_dir = batches.create_batch_dir(batch.id)
+
     zip = ZipFile(raw_file)
-    for file in zip.namelist():
-        if is_file_allowed(file):
+    for file in zip.infolist():
+        if is_file_allowed(file.filename):
             resume_object_id = str(ObjectId())
             zip_bytes = zip.read(file)
             content = engine.process_file(BytesIO(zip_bytes))
-
+            file.filename = f'{resume_object_id}_' + os.path.basename(file.filename)
+            filepath = os.path.join(batch_dir, file.filename)
+            
+            zip.extract(file, batch_dir)
+            
             resumes.create_resume(
                 db,
                 ResumeCreate(
-                    user_id=user.id, filename=file,
+                    user_id=user.id, filename=filepath,
                     batch_id=batch.id, content=content,
-                    object_id=resume_object_id, tag_id=tag.id,
-                    file=zip_bytes
+                    object_id=resume_object_id, tag_id=tag.id
                 )
             )
+            
+
     logger.info(f'Done processing batch {batch_id}')
 
 def launch_task(

@@ -1,4 +1,5 @@
 from typing import Optional
+import shutil
 
 from sqlalchemy.orm import Session
 
@@ -6,8 +7,9 @@ from app import models, schemas
 from app.crud import constraints
 
 
-def get_resume(db: Session, id: Optional[int] = None):
-    return db.query(models.Resume).filter(models.Resume.id == id).first()
+def get_resume(db: Session, id: Optional[int] = None, user_id: Optional[int] = None):
+    if resume := constraints.resume_exists_and_belongs_to_user(db, id, user_id):
+        return resume
 
 def get_resume_by_object_id(db: Session, object_id: Optional[int] = None):
     return db.query(models.Resume).filter(models.Resume.object_id == object_id).first()
@@ -36,7 +38,8 @@ def get_resumes(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Resume).offset(skip).limit(limit).all()
 
 def get_resumes_by_tag_id(db: Session, tag_id: int, user_id: int) -> Optional[list[models.Resume]]:
-    if resumes := (constraints.tag_id_exists_and_belongs_to_user(db, tag_id, user_id)):
+    if tag := (constraints.tag_id_exists_and_belongs_to_user(db, tag_id, user_id)):
+        resumes = db.query(models.Resume).filter_by(user_id=user_id, tag_id=tag_id).all()
         return resumes
 
     return None
@@ -58,6 +61,7 @@ def update_resume(db: Session, resume: schemas.ResumeUpdate, user: schemas.User)
     return db_resume
 
 def delete_resume(db: Session, resume: models.Resume):
+    shutil.rmtree(resume.filename)
     db.delete(resume)
     db.commit()
     return resume.object_id

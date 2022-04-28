@@ -1,5 +1,4 @@
 import pathlib
-from io import BytesIO
 
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
@@ -7,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.models import User
 from app.crud import resumes as crud_resumes
 from app.crud import tags as crud_tags
+from app.crud import batches as crud_batches
 from app.schemas import resume as resume_schema
 from app.schemas import resume_tag as tag_schema
 from tests.api_v1.conftest import TestClient, api_v1_config
@@ -33,6 +33,7 @@ def test_resume_ingest(client: TestClient, current_user: User):
     assert response.status_code == 202
     assert response_json.get('detail') == 'task was added to queue'
     assert len(response_json.get('batch_id')) == 24
+    assert crud_batches.delete_batch_dir(response_json.get('batch_id'))
 
 def test_resume_ingest_invalid_file_type(client: TestClient, current_user: User):
     test_filename = 'resumes.zip'
@@ -125,8 +126,7 @@ def test_delete_resume(client: TestClient, current_user: User, second_generic_us
         object_id='fakeobjectidfortestingx', 
         user_id=current_user.id, filename='filename.pdf',
         batch_id='fakeobjectidfortestingx', tag_id=db_tag.id, 
-        content={'content': 'this is a test resume'},
-        file=b'testbytes'
+        content={'content': 'this is a test resume'}
     )
     db_resume = crud_resumes.create_resume(db_session, resume)
     

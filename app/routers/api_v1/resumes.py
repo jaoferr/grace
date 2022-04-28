@@ -5,6 +5,7 @@ from tempfile import NamedTemporaryFile
 
 from bson.objectid import ObjectId
 from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, UploadFile
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from app import models, schemas
@@ -112,13 +113,30 @@ def export_resumes(current_user: models.User = Depends(get_current_user)):
 
     return {'detail': f'exported user "{current_user.username}" resumes to {filepath}'}
 
-# @router.get('/{resume_id}', response_model=schemas.Resume)
 @router.get('.get_by_id', response_model=schemas.Resume)
-def get_resume(resume_id: int, db: Session = Depends(get_db)):
-    resume = crud_resumes.get_resume(db, resume_id)
+def get_resume(
+    resume_id: int,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    resume = crud_resumes.get_resume(db, resume_id, current_user.id)
     if resume is None:
-        raise HTTPException(404, 'User not found')
+        raise HTTPException(404, 'Resume not found')
     return resume
+
+@router.get('.get_file_by_id')
+def get_resume_file(
+    resume_id: int,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    resume = crud_resumes.get_resume(db, resume_id, current_user.id)
+    if resume is None:
+        raise HTTPException(404, 'Resume not found')
+
+    response = FileResponse(path=resume.filename, filename=os.path.basename(resume.filename))
+    return response
+
 
 @router.get('.tag/{tag}', response_model=schemas.ResumeTag)
 def get_resumes_by_tag(

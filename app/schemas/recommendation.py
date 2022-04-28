@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 from pydantic import BaseModel
 
@@ -8,6 +8,7 @@ class RecommendationBase(BaseModel):
 
 
 class Recommendation(RecommendationBase):   
+    resume_id: int
     filename: str
     scores: Dict[str, float]
     final_score: float
@@ -16,7 +17,7 @@ class Recommendation(RecommendationBase):
 class RecommendationRequest(RecommendationBase):
     tag_id: int
     job_id: int
-    weights: Dict[str, float]
+    weights: Optional[Dict[str, float]] = 'default'
     n_scores: int
 
 
