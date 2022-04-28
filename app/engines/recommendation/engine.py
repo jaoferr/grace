@@ -13,7 +13,7 @@ from app.schemas.recommendation import Recommendation
 
 class RecommendingEngine:
 
-    def __init__(self, weighted_methods: dict[str: float]) -> None:
+    def __init__(self, weighted_methods: dict[str: float] or str) -> None:
         self.weighted_methods = self.init_methods(weighted_methods)
 
         if not os.path.exists('./venv/nltk_data/punkt'):
@@ -92,11 +92,20 @@ class RecommendingEngine:
             pass
 
 
-    def init_methods(self, weighted_methods: dict[str: float]) -> dict[str: float]:
-        valid_methods = {
-            method: weight for method, weight in weighted_methods.items() \
-                if callable(getattr(self.Methods, method, None))
-        }
+    def init_methods(self, weighted_methods: dict[str: float] or str) -> dict[str: float]:
+        if not isinstance(weighted_methods, dict):
+            valid_methods = {
+                'simple_word_count': 0.3,
+                'levenshtein_ratio': 0.3,
+                'cosine_similarity': 0.4
+            }
+        
+        else:
+            valid_methods = {
+                method: weight for method, weight in weighted_methods.items() \
+                    if callable(getattr(self.Methods, method, None))
+            }
+
         return valid_methods
 
     def run_methods(self, job: str, resume: str) -> float:

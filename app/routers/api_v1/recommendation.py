@@ -24,7 +24,7 @@ def make_recommendation(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if not (job:= crud_jobs.get_job_by_id(db, recommendation_request.job_id)):
+    if not (job:= crud_jobs.get_job_by_id(db, recommendation_request.job_id, current_user.id)):
         raise HTTPException(404, f'job not found with job_id "{recommendation_request.job_id}"')
     if not (resumes:= crud_resumes.get_resumes_by_tag_id(db, recommendation_request.tag_id, current_user.id)):
         raise HTTPException(404, f'no resumes found with tag id {recommendation_request.tag_id}"')

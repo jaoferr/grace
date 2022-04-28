@@ -38,7 +38,8 @@ def get_resumes(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Resume).offset(skip).limit(limit).all()
 
 def get_resumes_by_tag_id(db: Session, tag_id: int, user_id: int) -> Optional[list[models.Resume]]:
-    if resumes := (constraints.tag_id_exists_and_belongs_to_user(db, tag_id, user_id)):
+    if tag := (constraints.tag_id_exists_and_belongs_to_user(db, tag_id, user_id)):
+        resumes = db.query(models.Resume).filter_by(user_id=user_id, tag_id=tag_id).all()
         return resumes
 
     return None

@@ -1,5 +1,3 @@
-from sqlalchemy.orm import Session
-
 from app import models, schemas
 from app.engines.recommendation.engine import RecommendingEngine
 
@@ -12,7 +10,7 @@ def task(
     job: models.Jobs,
     resumes: list[models.Resume],
     n_scores: int
-) -> list[schemas.Recommendation]:
+    ) -> list[schemas.Recommendation]:
     recommendations = []
     for resume in resumes:
         scores, final_score = engine.run_methods(
@@ -20,7 +18,9 @@ def task(
         )
         recommendations.append(
             schemas.Recommendation(
-                filename=resume.filename, scores=scores,
+                resume_id=resume.id,
+                filename=resume.filename,
+                scores=scores,
                 final_score=final_score
             )
         )
@@ -33,7 +33,7 @@ def launch_task(
     job: models.Jobs,
     resumes: list[models.Resume],
     n_scores: int
-) -> list[schemas.Recommendation]:
+    ) -> list[schemas.Recommendation]:
     return task(
         RecommendingEngine(weighted_methods),
         job,
