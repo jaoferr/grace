@@ -4,7 +4,6 @@ import shutil
 from sqlalchemy.orm import Session
 
 from app import models, schemas
-from app.crud import constraints
 
 
 def create_batch(db: Session, batch: schemas.BatchCreate):
@@ -15,14 +14,14 @@ def create_batch(db: Session, batch: schemas.BatchCreate):
     return db_batch
 
 def create_batch_dir(batch_id: str):
-    batch_dir = os.path.join('temp', batch_id)
+    batch_dir = os.path.join('app/data/', batch_id)
     if not os.path.exists(batch_dir):
         os.makedirs(batch_dir)
 
     return batch_dir
 
 def delete_batch_dir(batch_id: str):
-    batch_dir = os.path.join('temp', batch_id)
+    batch_dir = os.path.join('app/data/', batch_id)
     try:
         shutil.rmtree(batch_dir)
         return True

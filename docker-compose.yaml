@@ -1,18 +1,33 @@
 version: "3.8"
 
 services:
+  database:
+    image: mysql:8.0.28
+    env_file:
+      - mysql.env
+    ports:
+      - "3306"
+    volumes:
+      - "app_db:/var/lib/mysql"
+
+  tika:
+    image: apache/tika:2.3.0
+    ports:
+      - "9998"
+
   app:
+    # image: grace_app
     build: .
     env_file:
-      - .env
+      - build.env
+    environment:
+      - SQL_HOST=database
+      - TIKA_HOST=tika
     ports:
       - "8000:8000"
+    volumes:
+      - "app_data:/app/data"
 
-
-  database:
-    image: mysql:5.7
-    env_file:
-      - .env
-    ports:
-      - "3306:3306"
-
+volumes:
+  app_data:
+  app_db:
