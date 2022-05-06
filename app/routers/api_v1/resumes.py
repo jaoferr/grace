@@ -177,11 +177,8 @@ def delete_resume(
     if not crud_constraints.tag_id_exists_and_belongs_to_user(db, resume.tag_id, current_user.id):
         raise HTTPException(status_code=404, detail='tag does not exist')
 
-    try:
-        removed = crud_resumes.delete_resume(db, resume)
-        return {'object_id': removed, 'success': True}
-    except:
-        return {'success': False}
+    removed = crud_resumes.delete_resume(db, resume)
+    return {'object_id': removed, 'success': True}
 
 @router.post('.delete_all')
 def delete_all_resumes(db: Session = Depends(get_db)):
