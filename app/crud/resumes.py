@@ -47,10 +47,13 @@ def get_resumes_by_tag_id(db: Session, tag_id: int, user_id: int) -> Optional[li
 
 def delete_all_resumes(db: Session) -> bool:
     if os.path.exists('app/data/'):
-        shutil.rmtree('app/data/')
+        for root, dirnames, files in os.walk('app/data/'):
+            for file in files:
+                os.remove(os.path.join(root, file))
 
-    os.makedirs('app/data') 
     db.query(models.Resume).delete()
+    db.query(models.ResumeTag).delete()
+    db.query(models.Batch).delete()
     db.commit()
     return True
 
