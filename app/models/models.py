@@ -60,8 +60,10 @@ class Jobs(Base):
     __tablename__ = 'jobs'
 
     id = Column(Integer, primary_key=True, unique=True, index=True)
+    name = Column(Text)
     description = Column(Text)
     user_id = Column(Integer, ForeignKey('user.id'))
+    timestamp = Column(DateTime, index=True, default=datetime.utcnow())
 
     owner = relationship('User', back_populates='jobs')
 
@@ -72,6 +74,15 @@ class ResumeTag(Base):
     id = Column(Integer, primary_key=True, unique=True, autoincrement=True, index=True)
     user_id = Column(Integer, ForeignKey('user.id'))
     tag = Column(String(255), unique=True, index=True)
+    timestamp = Column(DateTime, index=True, default=datetime.utcnow())
 
     user = relationship('User', back_populates='tag')
     resumes = relationship('Resume', back_populates='tag')
+
+    @hybrid_property
+    def resume_count(self):
+        return len(self.resumes)
+
+    @hybrid_property
+    def disk_size(self):
+        return 1e6

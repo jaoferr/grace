@@ -146,3 +146,4 @@ app/core/export/*
 app/core/export/*/
 !.gitkeep
 temp/*
+app/data/*

@@ -15,19 +15,6 @@ services:
     ports:
       - "9998:9998"
 
-  app:
-    # image: grace_app
-    build: .
-    env_file:
-      - build.env
-    environment:
-      - SQL_HOST=database
-      - TIKA_HOST=tika
-    ports:
-      - "8000:8000"
-    volumes:
-      - "app_data:/app/data"
-
   phpmyadmin:
     image: phpmyadmin
     ports:
@@ -44,5 +31,4 @@ services:
       - PMA_PASSWORD=admin
 
 volumes:
-  app_data:
   app_db:

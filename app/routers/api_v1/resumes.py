@@ -130,8 +130,7 @@ def get_resume_file(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    resume = crud_resumes.get_resume(db, resume_id, current_user.id)
-    if resume is None:
+    if not (resume := crud_resumes.get_resume(db, resume_id, current_user.id)):
         raise HTTPException(404, 'Resume not found')
 
     response = FileResponse(path=resume.filename, filename=os.path.basename(resume.filename))
@@ -177,11 +176,10 @@ def delete_resume(
     if not crud_constraints.tag_id_exists_and_belongs_to_user(db, resume.tag_id, current_user.id):
         raise HTTPException(status_code=404, detail='tag does not exist')
 
-    try:
-        removed = crud_resumes.delete_resume(db, resume)
-        return {'object_id': removed, 'success': True}
-    except:
-        return {'success': False}
+    if not (removed := crud_resumes.delete_resume(db, resume)):
+        raise HTTPException(status_code=500)
+    return {'id': removed, 'success': True}
+    
 
 @router.post('.delete_all')
 def delete_all_resumes(db: Session = Depends(get_db)):

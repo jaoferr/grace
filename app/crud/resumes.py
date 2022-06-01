@@ -1,5 +1,6 @@
-from typing import Optional
+import os
 import shutil
+from typing import Optional
 
 from sqlalchemy.orm import Session
 
@@ -45,7 +46,14 @@ def get_resumes_by_tag_id(db: Session, tag_id: int, user_id: int) -> Optional[li
     return None
 
 def delete_all_resumes(db: Session) -> bool:
+    if os.path.exists('app/data/'):
+        for root, dirnames, files in os.walk('app/data/'):
+            for file in files:
+                os.remove(os.path.join(root, file))
+
     db.query(models.Resume).delete()
+    db.query(models.ResumeTag).delete()
+    db.query(models.Batch).delete()
     db.commit()
     return True
 
@@ -54,14 +62,17 @@ def update_resume(db: Session, resume: schemas.ResumeUpdate, user: schemas.User)
 
     for field, value in vars(resume).items():
         setattr(db_resume, field, value) if value else None
-        
+
     db.add(db_resume)
     db.commit()
     db.refresh(db_resume)
     return db_resume
 
 def delete_resume(db: Session, resume: models.Resume):
-    shutil.rmtree(resume.filename)
+    os.remove(resume.filename)
+    if os.path.exists(resume.filename):
+        return False
+
     db.delete(resume)
     db.commit()
-    return resume.object_id
+    return resume.id

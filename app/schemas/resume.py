@@ -22,7 +22,8 @@ class ResumeUpdate(BaseModel):
     content: Optional[Dict[Any, Any]]
 
 
-class ResumeDelete(ResumeBase):
+class ResumeDelete(BaseModel):
+    id: int
     success: bool
 
 

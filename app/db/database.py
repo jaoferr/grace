@@ -1,3 +1,5 @@
+import time
+
 from sqlalchemy import create_engine
 from sqlalchemy import exc as sql_exc
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
@@ -18,7 +20,14 @@ def start_sql_engine():
         logger.warning(f'Database server is not running. App will not work properly.')
         return None, None
 
+attempt_no = 0
+engine, SessionLocal = False, False
 engine, SessionLocal = start_sql_engine()
+while not (engine and SessionLocal):
+    attempt_no += 1
+    logger.warning(f'Retrying in 3s (attempt number {attempt_no})')
+    time.sleep(3)
+    engine, SessionLocal = start_sql_engine()
        
 
 @as_declarative()
