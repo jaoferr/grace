@@ -78,3 +78,11 @@ class ResumeTag(Base):
 
     user = relationship('User', back_populates='tag')
     resumes = relationship('Resume', back_populates='tag')
+
+    @hybrid_property
+    def resume_count(self):
+        return len(self.resumes)
+
+    @hybrid_property
+    def disk_size(self):
+        return 1e6

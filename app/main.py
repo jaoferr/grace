@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.routers.api_v1 import auth, jobs, main, recommendation, resumes, users
+from app.routers.api_v1 import auth, jobs, main, recommendation, resumes, tags, users
 
 
 def get_application():
@@ -22,6 +22,7 @@ def get_application():
     _app.include_router(auth.router)
     _app.include_router(jobs.router)
     _app.include_router(recommendation.router)
+    _app.include_router(tags.router)
 
 
     return _app
