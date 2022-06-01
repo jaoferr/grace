@@ -23,18 +23,21 @@ GRACE é constituída de duas partes principais:
 
 ---
 ## Utilização
-### Observações
-Eventualmente, GRACE estará disponível em um container ```docker```, facilitando a sua implementação.
+### Docker (recomendado)
+Para subir um ambiente *docker* com todas as dependências já instaladas e configuradas, **clone o repositório** e execute o comando ```docker compose up``` dentro da pasta clonada.
 
-Para desenvolvimento, é preciso fornecer um servidor ```MySQL``` e um <i>endpoint</i> ```Apache Tika```. Há um arquivo chamado ```docker_run``` neste repositório que contém comandos para criar e executar <i>containers</i> com as duas aplicações.
+Utilizando um navegador de sua escolha, vá até ```http://localhost:8000/docs``` ou ```http://127.0.0.1:8000/docs``` para acessar a documentação da API.
+
+### Manual
+É preciso fornecer um servidor ```MySQL``` e um <i>endpoint</i> ```Apache Tika```. Há um arquivo chamado ```docker_run``` neste repositório que contém comandos para criar e executar <i>containers</i> com as duas aplicações.
 
 Um arquivo exemplo ```.env``` com as configurações necessárias está disponível neste respositório.
 
-É necessário, no mínimo, ```python 3.9``` ou superior.
+É necessário ```python 3.9``` ou superior.
 
 As instruções apresentadas assumem um ambiente ```Linux```.
 
-### Subindo um servidor local
+#### **Subindo um servidor local**
 Após instalar e configurar os serviços necessários, ```crie um novo ambiente python e instale as dependencias necessárias```:
    - ```python3.9 -m venv venv```
    - ```source venv/bin/activate```
@@ -43,7 +46,7 @@ Após instalar e configurar os serviços necessários, ```crie um novo ambiente 
 Defina as variáveis de ambiente, conforme o exemplo ```.env_example```.
 Inicie o servidor com o comando ```source start_server.sh```.
 
-Utilizando um navegador de sua escolha, vá até ```http://127.0.0.1:8000/docs``` para acessar a documentção da API.
+---
 
 ## Outras considerações
 Este projeto está sendo desenvolvido durante o curso de Ciência de Dados da FATEC Ourinhos.
