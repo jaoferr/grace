@@ -26,16 +26,9 @@ def batch_exists_and_belongs_to_user(db: Session, batch_id: str, user_id: int) -
     return False
 
 def job_exists_and_belongs_to_user(
-    db: Session, user_id: int,
-    name: str = None, description: str = None
-) -> Union[models.Jobs, bool]:
-    query_payload = {}
-    if name:
-        query_payload['name'] = name
-    if description:
-        query_payload['description'] = description
-
-    if job := (db.query(models.Jobs).filter_by(user_id=user_id, **query_payload).first()):
+    db: Session, user_id: int, name: str = None
+    ) -> Union[models.Jobs, bool]:
+    if job := (db.query(models.Jobs).filter_by(user_id=user_id, name=name).first()):
         return job
     return False
 

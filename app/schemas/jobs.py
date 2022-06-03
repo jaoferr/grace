@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
+from datetime import datetime
+
 
 class JobBase(BaseModel):
     name: str
@@ -22,6 +24,7 @@ class Job(JobBase):
     user_id: int
     name: str
     description: str
+    timestamp: datetime
 
     class Config:
         orm_mode = True

@@ -17,7 +17,7 @@ def get_user_jobs(db: Session, user_id = int, skip: int = 0, limit: int = 20):
         .offset(skip).limit(limit).all()
 
 def create_job(db: Session, job: schemas.JobCreate):
-    if db_job := (constraints.job_exists_and_belongs_to_user(db, user_id=job.user_id, description=job.description)):
+    if db_job := (constraints.job_exists_and_belongs_to_user(db, user_id=job.user_id, name=job.name)):
         return None
 
     db_job = models.Jobs(**job.dict())
