@@ -56,7 +56,7 @@ def get_resumes_by_batch_id(
 async def ingest_resume(
     background_tasks: BackgroundTasks,
     file: UploadFile, 
-    tag: str = Form(...),
+    tag_name: str = Form(...),
     current_user: models.User = Depends(get_current_user),
     engine: IngestingEngine = Depends(get_engine),
     tika_status: bool = Depends(get_tika_status),
@@ -82,7 +82,7 @@ async def ingest_resume(
     background_tasks.add_task(
         ingest.launch_task,
         file=temp_file, user=current_user,
-        batch_id=batch_id, tag=tag,
+        batch_id=batch_id, tag_name=tag_name,
         engine=engine, db=db
     )
     await file.close()

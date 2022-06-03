@@ -39,7 +39,8 @@ async def create_resume_tag(
 ):
     new_tag = schemas.ResumeTagCreate(
         user_id=current_user.id,
-        tag=form_data.tag
+        name=form_data.name,
+        description=form_data.description
     )
     if (tag_db := crud_tags.create_tag(db, new_tag)):
         return tag_db

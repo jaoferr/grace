@@ -10,8 +10,8 @@ def is_user_in_db(db: Session, user_id: int) -> Union[models.User, bool]:
         return user
     return False
 
-def tag_exists_and_belongs_to_user(db: Session, tag: str, user_id: int) -> Union[models.ResumeTag, bool]:
-    if tag := (db.query(models.ResumeTag).filter_by(tag=tag, user_id=user_id).first()):
+def tag_exists_and_belongs_to_user(db: Session, name: str, user_id: int) -> Union[models.ResumeTag, bool]:
+    if tag := (db.query(models.ResumeTag).filter_by(name=name, user_id=user_id).first()):
         return tag
     return False
 

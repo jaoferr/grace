@@ -73,7 +73,8 @@ class ResumeTag(Base):
 
     id = Column(Integer, primary_key=True, unique=True, autoincrement=True, index=True)
     user_id = Column(Integer, ForeignKey('user.id'))
-    tag = Column(String(255), unique=True, index=True)
+    name = Column(String(255), unique=True, index=True)
+    description = Column(Text)
     timestamp = Column(DateTime, index=True, default=datetime.utcnow())
 
     user = relationship('User', back_populates='tag')
