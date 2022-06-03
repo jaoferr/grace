@@ -60,7 +60,7 @@ class Jobs(Base):
     __tablename__ = 'jobs'
 
     id = Column(Integer, primary_key=True, unique=True, index=True)
-    name = Column(Text)
+    name = Column(String(256))
     description = Column(Text)
     user_id = Column(Integer, ForeignKey('user.id'))
     timestamp = Column(DateTime, index=True, default=datetime.utcnow())
@@ -73,7 +73,7 @@ class ResumeTag(Base):
 
     id = Column(Integer, primary_key=True, unique=True, autoincrement=True, index=True)
     user_id = Column(Integer, ForeignKey('user.id'))
-    name = Column(String(255), unique=True, index=True)
+    name = Column(String(256), index=True)
     description = Column(Text)
     timestamp = Column(DateTime, index=True, default=datetime.utcnow())
 

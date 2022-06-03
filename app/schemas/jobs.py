@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class JobBase(BaseModel):
-    description: str
+    name: str
 
 
 class JobQuery(JobBase):
@@ -11,15 +11,17 @@ class JobQuery(JobBase):
 
 class JobCreate(JobBase):
     user_id: int
-
+    description: str
 
 class JobCreateExternal(JobBase):
-    pass
+    description: str
 
 
 class Job(JobBase):
-    user_id: int
     id: int
+    user_id: int
+    name: str
+    description: str
 
     class Config:
         orm_mode = True
