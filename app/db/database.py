@@ -28,7 +28,7 @@ while not (engine and SessionLocal):
     logger.warning(f'Retrying in 3s (attempt number {attempt_no})')
     time.sleep(3)
     engine, SessionLocal = start_sql_engine()
-       
+
 
 @as_declarative()
 class Base:
