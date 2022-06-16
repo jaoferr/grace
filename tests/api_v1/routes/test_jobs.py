@@ -10,7 +10,7 @@ PREFIX = api_v1_config.PREFIX + '/jobs'
 
 def test_create_job(client: TestClient, current_user: User):
     ''' Generic job creation '''
-    job = jobs_schema.JobCreateExternal(description='test job description')
+    job = jobs_schema.JobCreateExternal(name="test job name", description='test job description')
     data = jsonable_encoder(job)
     response = client.post(
         url=PREFIX + '.create', json=data
@@ -24,7 +24,7 @@ def test_create_job(client: TestClient, current_user: User):
     
 def test_create_job_fail(client: TestClient, current_user: User, db_session: Session):
     ''' Tries to create a duplicated job '''
-    job = jobs_schema.JobCreate(description='test job description', user_id=current_user.id)
+    job = jobs_schema.JobCreate(name="test job name", description='test job description', user_id=current_user.id)
     db_job = crud_jobs.create_job(db_session, job)
 
     data = jsonable_encoder(job)
@@ -41,7 +41,7 @@ def test_get_job_fail(
     second_generic_user: User, db_session: Session
 ):
     ''' Creates a job and tries to retrieve using another user '''
-    job = jobs_schema.JobCreate(description='test job description', user_id=second_generic_user.id)
+    job = jobs_schema.JobCreate(name="test job name", description='test job description', user_id=second_generic_user.id)
     db_job = crud_jobs.create_job(db_session, job)
 
     response = client.get(
@@ -56,7 +56,7 @@ def test_get_current_user_jobs(
     db_session: Session
 ):
     for i in range(3):
-        job = jobs_schema.JobCreate(description=f'job-{i}', user_id=current_user.id)
+        job = jobs_schema.JobCreate(name=f"test job name-{i}", description=f'job-{i}', user_id=current_user.id)
         db_job = crud_jobs.create_job(db_session, job)
         
     response = client.get(

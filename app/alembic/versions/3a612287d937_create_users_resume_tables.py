@@ -37,7 +37,7 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('timestamp', sa.DateTime(), nullable=True),
     sa.Column('filename', sa.String(length=255), nullable=True),
-    sa.Column('batch_id', sa.String(length=25), nullable=True),
+    sa.Column('batch_id', sa.String(length=24), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('id')

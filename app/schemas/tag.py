@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 from pydantic import BaseModel
@@ -8,13 +8,15 @@ from app.schemas import Resume
 
 class ResumeTagBase(BaseModel):
     user_id: int
-    tag: str
+    name: str
+    description: Optional[str]
 
 class ResumeTagQuery(ResumeTagBase):
     pass
 
 class ResumeTagCreateExternal(BaseModel):
-    tag: str
+    name: str
+    description: Optional[str]
 
 class ResumeTagCreate(ResumeTagBase):
     pass
@@ -22,7 +24,8 @@ class ResumeTagCreate(ResumeTagBase):
 class ResumeTag(ResumeTagBase):
     id: int
     # resumes: List[Resume]
-    tag: str
+    name: str
+    description: Optional[str]
     timestamp: datetime
     resume_count: int
     disk_size: int

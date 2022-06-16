@@ -12,7 +12,7 @@ def get_tags_by_user_id(db: Session, user_id: int, skip: int, limit: int):
         .filter_by(user_id=user_id).offset(skip).limit(limit).all()
 
 def create_tag(db: Session, tag: schemas.ResumeTagCreate) -> models.ResumeTag:
-    if db_tag := (constraints.tag_exists_and_belongs_to_user(db, **tag.dict())):
+    if db_tag := (constraints.tag_exists_and_belongs_to_user(db, name=tag.name, user_id=tag.user_id)):
         return db_tag
 
     db_tag = models.ResumeTag(**tag.dict())

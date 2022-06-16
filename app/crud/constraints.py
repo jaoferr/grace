@@ -10,8 +10,8 @@ def is_user_in_db(db: Session, user_id: int) -> Union[models.User, bool]:
         return user
     return False
 
-def tag_exists_and_belongs_to_user(db: Session, tag: str, user_id: int) -> Union[models.ResumeTag, bool]:
-    if tag := (db.query(models.ResumeTag).filter_by(tag=tag, user_id=user_id).first()):
+def tag_exists_and_belongs_to_user(db: Session, name: str, user_id: int) -> Union[models.ResumeTag, bool]:
+    if tag := (db.query(models.ResumeTag).filter_by(name=name, user_id=user_id).first()):
         return tag
     return False
 
@@ -26,15 +26,10 @@ def batch_exists_and_belongs_to_user(db: Session, batch_id: str, user_id: int) -
     return False
 
 def job_exists_and_belongs_to_user(
-    db: Session, user_id: int,
-    description: str = None, job_id: int = None
-) -> Union[models.Jobs, bool]:
-    if description:
-        if jobs := (db.query(models.Jobs).filter_by(description=description, user_id=user_id).first()):
-            return jobs
-    if job_id:
-        if jobs := (db.query(models.Jobs).filter_by(id=job_id, user_id=user_id).first()):
-            return jobs
+    db: Session, user_id: int, name: str = None
+    ) -> Union[models.Jobs, bool]:
+    if job := (db.query(models.Jobs).filter_by(user_id=user_id, name=name).first()):
+        return job
     return False
 
 def resume_exists_and_belongs_to_user(db: Session, resume_id: int, user_id: int) -> Union[models.Resume, bool]:

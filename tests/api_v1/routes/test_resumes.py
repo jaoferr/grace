@@ -18,7 +18,7 @@ def test_resume_ingest(client: TestClient, current_user: User):
     test_data_path = str(pathlib.Path(__file__).parent.joinpath('test_data', test_filename))
     
     data = {
-        'tag': 'test_tag'
+        'tag_name': 'test_tag'
     }
 
     files = {
@@ -40,7 +40,7 @@ def test_resume_ingest_invalid_file_type(client: TestClient, current_user: User)
     test_data_path = str(pathlib.Path(__file__).parent.joinpath('test_data', test_filename))
     
     data = {
-        'tag': 'test_tag'
+        'tag_name': 'test_tag'
     }
 
     files = {
@@ -60,7 +60,7 @@ def test_resume_tika_status(client: TestClient, current_user: User, tika_status_
     test_data_path = str(pathlib.Path(__file__).parent.joinpath('test_data', test_filename))
     
     data = {
-        'tag': 'test_tag'
+        'tag_name': 'test_tag'
     }
 
     files = {
@@ -76,7 +76,7 @@ def test_resume_tika_status(client: TestClient, current_user: User, tika_status_
     assert response_json.get('detail') == 'ingest endpoint is not available'
 
 def test_update_resume(client: TestClient, current_user: User, db_session: Session):
-    tag = tag_schema.ResumeTagCreate(user_id=current_user.id, tag='this is a test tag')
+    tag = tag_schema.ResumeTagCreate(user_id=current_user.id, name='this is a test tag')
     db_tag = crud_tags.create_tag(db_session, tag)
     resume = resume_schema.ResumeCreate(
         id=1, object_id='fakeobjectidfortestingx', 
@@ -99,7 +99,7 @@ def test_update_resume(client: TestClient, current_user: User, db_session: Sessi
     assert response_json.get('tag_id') == resume_updates.tag_id
 
 def test_update_resume_fail(client: TestClient, current_user: User, second_generic_user: User, db_session: Session):
-    tag = tag_schema.ResumeTagCreate(user_id=second_generic_user.id, tag='this is a test tag')
+    tag = tag_schema.ResumeTagCreate(user_id=second_generic_user.id, name='this is a test tag')
     db_tag = crud_tags.create_tag(db_session, tag)
     resume = resume_schema.ResumeCreate(
         object_id='fakeobjectidfortestingx', 
@@ -120,7 +120,7 @@ def test_update_resume_fail(client: TestClient, current_user: User, second_gener
     assert response_json.get('detail') == 'resume does not exist'
 
 def test_delete_resume(client: TestClient, current_user: User, second_generic_user: User, db_session: Session):
-    tag = tag_schema.ResumeTagCreate(user_id=current_user.id, tag='this is a test tag')
+    tag = tag_schema.ResumeTagCreate(user_id=current_user.id, name='this is a test tag')
     db_tag = crud_tags.create_tag(db_session, tag)
     resume = resume_schema.ResumeCreate(
         object_id='fakeobjectidfortestingx', 
@@ -140,7 +140,7 @@ def test_delete_resume(client: TestClient, current_user: User, second_generic_us
     assert response_json.get('success') == True
 
 def test_delete_resume_fail(client: TestClient, current_user: User, second_generic_user: User, db_session: Session):
-    tag = tag_schema.ResumeTagCreate(user_id=second_generic_user.id, tag='this is a test tag')
+    tag = tag_schema.ResumeTagCreate(user_id=second_generic_user.id, name='this is a test tag')
     db_tag = crud_tags.create_tag(db_session, tag)
     resume = resume_schema.ResumeCreate(
         object_id='fakeobjectidfortestingx', 

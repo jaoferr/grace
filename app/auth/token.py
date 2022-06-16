@@ -24,9 +24,6 @@ class TokenData(BaseModel):
 
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-
-
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=Config.PREFIX + '/auth.login')
 
 def verify_password(plain_password: str, hashed_password: str):

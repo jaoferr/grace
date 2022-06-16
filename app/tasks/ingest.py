@@ -22,11 +22,14 @@ def update_progress(task_id: ObjectId, progress: int):
 
 def task(
     raw_file: BufferedRandom, user: models.User, 
-    batch_id: str, tag: str, 
+    batch_id: str, tag_name: str, 
     engine: IngestingEngine, db: Session
 ):
     tag = tags.create_tag(
-        db, ResumeTagCreate(user_id=user.id, tag=tag)
+        db, ResumeTagCreate(
+            user_id=user.id, 
+            name=tag_name
+        )
     )
     batch = batches.create_batch(
         db, BatchCreate(id=batch_id, user_id=user.id)
@@ -59,9 +62,9 @@ def task(
 
 def launch_task(
     file: _TemporaryFileWrapper, user: models.User, 
-    batch_id: str, tag: str, 
+    batch_id: str, tag_name: str, 
     engine: IngestingEngine, db: Session
 ):
     ''' add to queue '''
-    task(file, user, batch_id, tag, engine, db)
+    task(file, user, batch_id, tag_name, engine, db)
     file.close()

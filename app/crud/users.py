@@ -18,7 +18,6 @@ def get_users(db: Session, skip: int = 0, limit: int = 100) -> list[models.User]
 
 from app.auth.token import get_password_hash
 
-
 def create_user(db: Session, user: schemas.UserCreate) -> models.User:
     db_user = models.User(
         # **user.dict()
