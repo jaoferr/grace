@@ -4,7 +4,7 @@ from httpx import AsyncClient
 
 from app.crud import users as crud_users
 from app.schemas import user as user_schema
-from tests.api_v1.conftest import TestClient, api_v1_config
+from tests.api_v1.conftest import api_v1_config
 
 PREFIX = api_v1_config.PREFIX + '/users'
 
@@ -39,15 +39,14 @@ async def test_get_user(client: AsyncClient):
     db_user = await crud_users.create_user(user)
 
     response = await client.post(
-        url=PREFIX + '.get_by_id', data={'user_id': db_user.id}
+        url=PREFIX + '.get_by_id', params={'user_id': str(db_user.id)}
     )
     response_json = response.json()
 
     assert response.status_code == 200
-    assert response_json.get('id') == db_user.id
+    assert response_json.get('id') == str(db_user.id)
     assert response_json.get('email') == db_user.email
     assert response_json.get('username') == db_user.username
-    assert response_json.get('resume_count') == db_user.resume_count
 
 # @pytest.mark.asyncio
 # async def test_get_user_404(client: AsyncClient):

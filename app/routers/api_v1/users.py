@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 
 from app import schemas
-from app.models import User
 from app.crud import users as crud_users
 from app.routers.api_v1.config import Config
 
@@ -14,9 +13,9 @@ router = APIRouter(
 )
 
 @router.post('.get_by_id', response_model=schemas.UserOut)
-async def get_user(user_id: int):
+async def get_user(user_id: str):
     if (user := await crud_users.get_by_id(user_id=user_id)) is None:
-        raise HTTPException(404, 'User not found')
+        raise HTTPException(404, 'user not found')
     return user
 
 @router.post('.create', response_model=schemas.UserOut)

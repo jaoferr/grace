@@ -3,7 +3,6 @@ from typing import Any, Generator
 import pytest
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 from app.auth.token import get_current_user

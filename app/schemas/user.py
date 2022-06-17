@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from beanie.odm.fields import PydanticObjectId
 
 
 class UserBase(BaseModel):
@@ -11,8 +12,13 @@ class UserCreate(UserBase):
 
 
 class UserOut(UserBase):
-    pass
+    id: PydanticObjectId
 
+    class Config:
+        # orm_mode = True
+        json_encoder = {
+            PydanticObjectId: lambda x: str(x)
+        }
 
 class User(UserBase):
 
