@@ -10,9 +10,11 @@ class UserCreate(UserBase):
     password: str
 
 
+class UserOut(UserBase):
+    pass
+
+
 class User(UserBase):
-    id: int
-    resume_count: int
 
     class Config:
         orm_mode = True

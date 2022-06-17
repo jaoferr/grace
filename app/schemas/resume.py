@@ -10,9 +10,8 @@ class ResumeBase(BaseModel):
 
 class ResumeCreate(ResumeBase):
     user_id: int
-    filename: str
-    batch_id: str
     tag_id: int
+    filename: str
     content: Dict[Any, Any]
 
 

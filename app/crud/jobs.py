@@ -1,27 +1,23 @@
-from sqlalchemy.orm import Session
-
-from app import models, schemas
-from app.crud import constraints
+from app.models import Job
+from app import schemas
 
 
-def get_job(db: Session, job: schemas.JobQuery):
-    return db.query(models.Jobs).filter_by(**job.dict()).first()
+async def get_by_id(oid: str):
+    return await Job.get(oid)
 
-def get_job_by_id(db: Session, job_id: int, user_id: int):
-    # if job := (constraints.job_exists_and_belongs_to_user(db, job_id=job_id, user_id=user_id)):
-        # return job
-    return db.query(models.Jobs).filter_by(id=job_id, user_id=user_id).first()
+async def get_by_id_and_user(job_id: str, user_id: str):
+    return await Job.find_one(Job.id == job_id & Job.user_id == user_id)
 
-def get_user_jobs(db: Session, user_id = int, skip: int = 0, limit: int = 20):
-    return db.query(models.Jobs).filter_by(user_id=user_id) \
-        .offset(skip).limit(limit).all()
+async def get_owned_by_user(user_id: str, skip: int = 0, limit: int = 20):
+    return await Job.find_many(Job.user_id == user_id) \
+        .skip(skip).limit(limit) \
+        .to_list()
 
-def create_job(db: Session, job: schemas.JobCreate):
-    if db_job := (constraints.job_exists_and_belongs_to_user(db, user_id=job.user_id, name=job.name)):
-        return None
+async def create_job(new_job: schemas.JobCreate):
+    job_db = Job(
+        name=new_job.name,
+        description=new_job.description,
+        user_id=new_job.user_id
+    )
 
-    db_job = models.Jobs(**job.dict())
-    db.add(db_job)
-    db.commit()
-    db.refresh(db_job)
-    return db_job
+    return await job_db.create()

@@ -1,77 +1,67 @@
-import os
-from typing import Optional
-
-from sqlalchemy.orm import Session
-
-from app import models, schemas
-from app.crud import constraints
+from app.models import Resume, Tag
+from app import schemas
 
 
-def get_resume(db: Session, id: Optional[int] = None, user_id: Optional[int] = None):
-    if resume := constraints.resume_exists_and_belongs_to_user(db, id, user_id):
-        return resume
+async def get_by_id(oid: str) -> Resume:
+    return await Resume.get(oid)
 
-def get_resume_by_object_id(db: Session, object_id: Optional[int] = None):
-    return db.query(models.Resume).filter(models.Resume.object_id == object_id).first()
+async def get_by_id_and_user(resume_id: str, user_id: str) -> Resume:
+    return await Resume.find_one(Resume.id == resume_id & Resume.user_id == user_id)
 
-def get_resumes_by_batch_id(db: Session, batch_id: str, skip: int = 0, limit: int = 100):
-    return db.query(models.Resume) \
-        .filter(models.Resume.batch_id == batch_id) \
-        .offset(skip).limit(limit).all()
+async def get_owned_by_user(user_id: str, skip: int = 0, limit: int = 100) -> list[Resume]:
+    return await Resume.find_many(Resume.user_id == user_id) \
+        .skip(skip).limit(limit) \
+        .to_list()
 
-def get_resumes_by_user_id(db: Session, user_id: int, skip: int = 0, limit: int = 100):
-    return db.query(models.Resume) \
-        .filter(models.Resume.user_id == user_id) \
-        .offset(skip).limit(limit).all()
+async def get_by_tag_id(tag_id: str, skip: int = 0, limit: int = 100) -> list[Resume]:
+    return await Resume.find_many(Resume.tag_id == tag_id) \
+        .skip(skip).limit(limit) \
+        .to_list()
 
-def create_resume(db: Session, resume: schemas.ResumeCreate):
-    if not constraints.tag_id_exists_and_belongs_to_user(db, resume.tag_id, resume.user_id):
-        return False
+async def get_by_tag_id_and_user(tag_id: str, user_id: str, skip: int = 0, limit: int = 100) -> list[Resume]:
+    return await Resume.find_many(Resume.tag_id == tag_id & Tag.user_id == user_id) \
+        .skip(skip).limit(limit) \
+        .to_list()
 
-    db_resume = models.Resume(**resume.dict())
-    db.add(db_resume)
-    db.commit()
-    db.refresh(db_resume)
-    return db_resume
+async def create_resume(new_resume: schemas.ResumeCreate) -> Resume:
+    resume_db = Resume(
+        filename=new_resume.filename,
+        user_id=new_resume.user_id,
+        tag_id=new_resume.tag_id,
+        content=new_resume.content
+    )
+    
+    return await resume_db.create()
 
-def get_resumes(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Resume).offset(skip).limit(limit).all()
+async def delete_by_id(oid: str) -> str:
+    resume = await get_by_id(oid)
+    return await resume.delete()
 
-def get_resumes_by_tag_id(db: Session, tag_id: int, user_id: int) -> Optional[list[models.Resume]]:
-    if tag := (constraints.tag_id_exists_and_belongs_to_user(db, tag_id, user_id)):
-        resumes = db.query(models.Resume).filter_by(user_id=user_id, tag_id=tag_id).all()
-        return resumes
 
-    return None
+async def delete_all() -> None:
+    # resume_delete = await Resume.delete_all()
+    # tag_delete = await Tag.delete_all()
+    raise NotImplementedError
 
-def delete_all_resumes(db: Session) -> bool:
-    if os.path.exists('app/data/'):
-        for root, dirnames, files in os.walk('app/data/'):
-            for file in files:
-                os.remove(os.path.join(root, file))
+async def delete_all_resumes() -> bool:
+    # if os.path.exists('app/data/'):
+    #     for root, dirnames, files in os.walk('app/data/'):
+    #         for file in files:
+    #             os.remove(os.path.join(root, file))
 
-    db.query(models.Resume).delete()
-    db.query(models.ResumeTag).delete()
-    db.query(models.Batch).delete()
-    db.commit()
-    return True
+    # db.query(models.Resume).delete()
+    # db.query(models.ResumeTag).delete()
+    # db.query(models.Batch).delete()
+    # db.commit()
+    # return True
+    raise NotImplementedError
 
-def update_resume(db: Session, resume: schemas.ResumeUpdate, user: schemas.User) -> models.Resume:
-    db_resume = db.query(models.Resume).filter_by(id=resume.id, user_id=user.id).first()
+async def delete_resume(resume: Resume):
+    # os.remove(resume.filename)
+    # if os.path.exists(resume.filename):
+    #     return False
 
-    for field, value in vars(resume).items():
-        setattr(db_resume, field, value) if value else None
-
-    db.add(db_resume)
-    db.commit()
-    db.refresh(db_resume)
-    return db_resume
-
-def delete_resume(db: Session, resume: models.Resume):
-    os.remove(resume.filename)
-    if os.path.exists(resume.filename):
-        return False
-
-    db.delete(resume)
-    db.commit()
-    return resume.id
+    # db.delete(resume)
+    # db.commit()
+    # return resume.id
+    raise NotImplementedError

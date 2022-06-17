@@ -31,12 +31,12 @@ class Settings(BaseSettings):
     TIKA_PORT: str
 
     # mongodb
-    MONGODB_DRIVER: str
-    MONGODB_HOST: str
-    MONGODB_PORT: str
-    MONGODB_DATABASE: str
-    MONGODB_USER: str
-    MONGODB_PASSWORD: str
+    NOSQL_DRIVER: str
+    NOSQL_HOST: str
+    NOSQL_PORT: str
+    NOSQL_DATABASE: str
+    NOSQL_USER: str
+    NOSQL_PASSWORD: str
 
 
     class Config:
@@ -49,10 +49,10 @@ class Settings(BaseSettings):
             'pdf', # 'doc', 'docx', 'jpeg', 'jpg'
         ]
         MAX_ZIP_FILE_SIZE = 1000 * 1e6  # 1GB
+        DATA_PATH = os.path.join('app', 'data')
 
-    @classmethod
-    def assemble_mongodb_conn_string(cls):
-        conn_string = f'{cls.MONGODB_DRIVER}://{cls.MONGODB_USER}:{cls.MONGODB_PASSWORD}@{cls.MONGODB_HOST}:{cls.MONGODB_PORT}'
+    def assemble_mongodb_conn_string(self):
+        conn_string = f'{self.NOSQL_DRIVER}://{self.NOSQL_USER}:{self.NOSQL_PASSWORD}@{self.NOSQL_HOST}:{self.NOSQL_PORT}'
         return conn_string
 
 

@@ -5,3 +5,8 @@ docker run -p 3306:3306 --name grace_mysql -dit \
 mysql:8.0.28
 
 docker run --name grace_tika -p 9998:9998 -dit apache/tika:2.3.0
+
+docker run --name grace-mongo -d -p 27017:27017 \
+-e MONGO_INITDB_ROOT_USERNAME=admin \
+-e MONGO_INITDB_ROOT_PASSWORD=admin \
+mongo:latest

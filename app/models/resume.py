@@ -4,7 +4,7 @@ from beanie import Document
 
 class Resume(Document):
     
-    timestamp_added: datetime
+    timestamp_added: datetime = datetime.now()
     filename: str
     content: str
     user_id: int

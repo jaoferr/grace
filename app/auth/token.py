@@ -6,11 +6,9 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
 
 from app import schemas
 from app.auth.config import auth_settings
-from app.db.dependency import get_db
 from app.routers.api_v1.config import Config
 
 
@@ -34,12 +32,10 @@ def get_password_hash(password: str):
 
 from app.crud import users as crud_users
 
-
-def authenticate_user(db: Session, username: str, password: str):
-    user = crud_users.get_user_by_username(db, username)
-    if not user:
+def authenticate_user(username: str, password: str):
+    if not (user := crud_users.get_by_username(username)):
         return False
-    if not verify_password(password, user.password_hash):
+    if not verify_password(password, user.password):
         return False
     return user
 
@@ -53,7 +49,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     encoded_jwt = jwt.encode(to_encode, auth_settings.SECRET_KEY, algorithm=auth_settings.ALGORITHM)
     return encoded_jwt
 
-async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> schemas.User:
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> schemas.User:
     try:
         payload = jwt.decode(token, auth_settings.SECRET_KEY, algorithms=[auth_settings.ALGORITHM])
         username: str = payload.get('sub')
@@ -62,7 +58,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         token_data = TokenData(username=username)
     except JWTError:
         raise auth_settings.Exceptions.CREDENTIALS
-    user = crud_users.get_user_by_username(db, username=token_data.username)
+    user = crud_users.get_by_username(username=token_data.username)
     if user is None:
         raise auth_settings.Exceptions.CREDENTIALS
     return user

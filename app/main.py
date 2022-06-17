@@ -1,9 +1,11 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.routers.api_v1 import auth, jobs, main, recommendation, resumes, tags, users
-
+from app.routers.api_v1 import auth, jobs, recommendation, resumes, tags, users
+from app.core.database import init_db, get_motor_client
 
 def get_application():
     _app = FastAPI(title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION)
@@ -17,7 +19,6 @@ def get_application():
     )
 
     _app.include_router(users.router)
-    _app.include_router(main.router)
     _app.include_router(resumes.router)
     _app.include_router(auth.router)
     _app.include_router(jobs.router)
@@ -27,10 +28,15 @@ def get_application():
 
     return _app
 
-# check dependencies
-from app.dependencies import dependencies
-
 app = get_application()
+
+@app.on_event('startup')
+async def app_init():
+    db_client = await get_motor_client()
+    await init_db(db_client)
+
+    if not os.path.exists(settings.Hardcoded.DATA_PATH):
+        os.makedirs(settings.Hardcoded.DATA_PATH)
 
 # temporary
 from fastapi import Request

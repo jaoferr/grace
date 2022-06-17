@@ -1,31 +1,22 @@
-from sqlalchemy.orm import Session
-
 from app import schemas
-from app.models import models
-
-
-def get_user(db: Session, user_id: int) -> models.User:
-    return db.query(models.User).filter(models.User.id == user_id).first()
-
-def get_user_by_username(db: Session, username: str) -> models.User:
-    return db.query(models.User).filter(models.User.username == username).first()
-
-def get_user_by_email(db: Session, email: str) -> models.User:
-    return db.query(models.User).filter(models.User.email == email).first()
-
-def get_users(db: Session, skip: int = 0, limit: int = 100) -> list[models.User]:
-    return db.query(models.User).offset(skip).limit(limit).all()
-
+from app.models import User
 from app.auth.token import get_password_hash
 
-def create_user(db: Session, user: schemas.UserCreate) -> models.User:
-    db_user = models.User(
-        # **user.dict()
-        username=user.username,
-        email=user.email,
-        password_hash=get_password_hash(user.password)
+async def get_by_id(user_id: str) -> User:
+    return await User.get(user_id)
+
+async def get_by_username(username: str) -> User:
+    return await User.find_one(User.username == username)
+
+async def get_by_email(email: str) -> User:
+    return await User.find_one(User.email == email)
+
+async def create_user(new_user: schemas.UserCreate):
+    user_in_db = User(
+        email=new_user.email,
+        username=new_user.username,
+        password=get_password_hash(new_user.password)
     )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+
+    await user_in_db.create()
+    return user_in_db
