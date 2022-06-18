@@ -19,7 +19,7 @@ async def get_user(user_id: str):
     
     return user
 
-@router.post('.create', response_model=schemas.UserOut)
+@router.post('.create', response_model=schemas.UserOut, response_model_by_alias=False)
 async def create_user(user: schemas.UserCreate):
     if (db_user := await crud_users.get_by_email(user.email)):
         raise HTTPException(status_code=400, detail='email already in use')

@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from beanie.odm.fields import PydanticObjectId
 
 from datetime import datetime
 
@@ -8,23 +9,23 @@ class JobBase(BaseModel):
 
 
 class JobQuery(JobBase):
-    user_id: int
+    user_id: PydanticObjectId
 
 
 class JobCreate(JobBase):
-    user_id: int
+    user_id: PydanticObjectId
     description: str
 
 class JobCreateExternal(JobBase):
     description: str
 
 
-class Job(JobBase):
-    id: int
-    user_id: int
+class JobOut(JobBase):
+    id: PydanticObjectId = Field(..., alias='_id')
+    user_id: PydanticObjectId
     name: str
     description: str
-    timestamp: datetime
+    timestamp_added: datetime
 
     class Config:
         orm_mode = True

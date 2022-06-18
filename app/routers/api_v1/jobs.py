@@ -11,19 +11,20 @@ router = APIRouter(
     tags=[Config.TAG, 'jobs'],
     responses={
         404: {'message': 'Not found'}
-    }
+    },
+    
 )
 
-@router.get('.from_current_user', response_model=list[schemas.Job])
-def get_jobs_from_current_user(
+@router.get('.from_current_user', response_model=list[schemas.JobOut], response_model_by_alias=False)
+async def get_jobs_from_current_user(
     skip: int = 0, limit: int = 20,
     current_user: User = Depends(get_current_user),
 ):
-    if not (jobs := crud_jobs.get_owned_by_user(current_user.id, skip, limit)):
+    if not (jobs := await crud_jobs.get_owned_by_user(current_user.id, skip, limit)):
         raise HTTPException(status_code=404, detail=f'user has no jobs')
     return jobs
 
-@router.post('.create', response_model=schemas.Job)
+@router.post('.create', response_model=schemas.JobOut, response_model_by_alias=False)
 async def create_job(
     new_job: schemas.JobCreateExternal, 
     current_user: User = Depends(get_current_user)
@@ -37,7 +38,7 @@ async def create_job(
 
     return db_job
 
-@router.get('.get_by_id', response_model=schemas.Job)
+@router.get('.get_by_id', response_model=schemas.JobOut, response_model_by_alias=False)
 async def get_job_by_id(
     job_id: str,
     current_user: User = Depends(get_current_user)
