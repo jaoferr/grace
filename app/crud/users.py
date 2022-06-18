@@ -15,7 +15,7 @@ async def create_user(new_user: schemas.UserCreate):
     user_in_db = User(
         email=new_user.email,
         username=new_user.username,
-        password=get_password_hash(new_user.password)
+        password=await get_password_hash(new_user.password)
     )
 
     await user_in_db.create()

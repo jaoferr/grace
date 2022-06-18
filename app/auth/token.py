@@ -18,28 +18,28 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    username: Optional[str] = None
+    username: str
 
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=Config.PREFIX + '/auth.login')
 
-def verify_password(plain_password: str, hashed_password: str):
+async def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
 
-def get_password_hash(password: str):
+async def get_password_hash(password: str):
     return pwd_context.hash(password)
 
 from app.crud import users as crud_users
 
-def authenticate_user(username: str, password: str):
-    if not (user := crud_users.get_by_username(username)):
+async def authenticate_user(username: str, password: str):
+    if not (user := await crud_users.get_by_username(username)):
         return False
-    if not verify_password(password, user.password):
+    if not await verify_password(password, user.password):
         return False
     return user
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+async def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -49,7 +49,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     encoded_jwt = jwt.encode(to_encode, auth_settings.SECRET_KEY, algorithm=auth_settings.ALGORITHM)
     return encoded_jwt
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> schemas.User:
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> schemas.UserOut:
     try:
         payload = jwt.decode(token, auth_settings.SECRET_KEY, algorithms=[auth_settings.ALGORITHM])
         username: str = payload.get('sub')
@@ -58,7 +58,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> schemas.User:
         token_data = TokenData(username=username)
     except JWTError:
         raise auth_settings.Exceptions.CREDENTIALS
-    user = crud_users.get_by_username(username=token_data.username)
+    user = await crud_users.get_by_username(username=token_data.username)
     if user is None:
         raise auth_settings.Exceptions.CREDENTIALS
     return user
