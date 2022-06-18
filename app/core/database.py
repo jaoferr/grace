@@ -5,7 +5,7 @@ from app.core.config import settings
 from app.models import user, job, resume, tag
 
 
-async def get_motor_client() -> AsyncIOMotorClient:
+def get_motor_client() -> AsyncIOMotorClient:
     client = AsyncIOMotorClient(
         settings.assemble_mongodb_conn_string()
     )

@@ -12,13 +12,8 @@ class UserCreate(UserBase):
 
 
 class UserOut(UserBase):
-    id: PydanticObjectId
+    id: PydanticObjectId = Field(..., alias='_id')
 
-    class Config:
-        # orm_mode = True
-        json_encoder = {
-            PydanticObjectId: lambda x: str(x)
-        }
 
 class User(UserBase):
 

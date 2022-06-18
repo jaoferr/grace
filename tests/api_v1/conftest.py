@@ -1,4 +1,4 @@
-from typing import Any, Generator
+from typing import Any, Generator, AsyncGenerator
 
 import pytest
 from fastapi import FastAPI
@@ -7,7 +7,7 @@ from httpx import AsyncClient
 
 from app.auth.token import get_current_user
 from app.core.config import settings
-from app.core.database import init_db, get_motor_client
+from app.core.database import init_db
 from app.routers.api_v1.config import Config as api_v1_config
 from app.crud import users as crud_users
 from app.dependencies import get_tika_status
@@ -41,36 +41,37 @@ def app() -> Generator[FastAPI, Any, None]:
 
     yield _app
 
+from mongomock_motor import AsyncMongoMockClient
 @pytest.mark.asyncio
 @pytest.fixture(scope='function')
-async def client(app: FastAPI) -> Generator[AsyncClient, Any, None]:
-    db_client = await get_motor_client()
+async def client(app: FastAPI) -> AsyncGenerator[Any, AsyncMongoMockClient]:
+    db_client = AsyncMongoMockClient()
+    
     await init_db(db_client, database_name='testing')
 
     async with AsyncClient(app=app, base_url='http://localhost:8000') as client:
-        yield client
-    
-    db_client.drop_database('testing')
-    
+        yield client    
 
+@pytest.mark.asyncio
 @pytest.fixture(scope='function')
-def generic_user() -> Generator[User, Any, None]:
+async def generic_user() -> AsyncGenerator[User, None]:
     user = schemas_users.UserCreate(
         username='generic_user', email='generic@email.com', password='generic_password'
     )
-    db_user = crud_users.create_user(user)
+    db_user = await  crud_users.create_user(user)
     yield db_user
 
+@pytest.mark.asyncio
 @pytest.fixture(scope='function')
-def second_generic_user() -> Generator[User, Any, None]:
+async def second_generic_user() -> AsyncGenerator[User, None]:
     user = schemas_users.UserCreate(
         username='generic_second_user', email='generic_second_user@email.com', password='generic_password'
     )
-    db_user = crud_users.create_user(user)
+    db_user = await crud_users.create_user(user)
     yield db_user
 
 @pytest.fixture(scope='function')
-def current_user(app: FastAPI, generic_user: User) -> Generator[User, Any, None]:
+def current_user(app: FastAPI, generic_user: User) -> User:
     def get_test_current_user():
         return generic_user
 
