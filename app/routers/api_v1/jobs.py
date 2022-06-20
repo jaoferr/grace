@@ -16,7 +16,7 @@ router = APIRouter(
 )
 
 @router.get('.from_current_user', response_model=list[schemas.JobOut], response_model_by_alias=False)
-async def get_jobs_from_current_user(
+async def get_from_current_user(
     skip: int = 0, limit: int = 20,
     current_user: User = Depends(get_current_user),
 ):
@@ -25,7 +25,7 @@ async def get_jobs_from_current_user(
     return jobs
 
 @router.post('.create', response_model=schemas.JobOut, response_model_by_alias=False)
-async def create_job(
+async def create(
     new_job: schemas.JobCreateExternal, 
     current_user: User = Depends(get_current_user)
 ):
@@ -40,7 +40,7 @@ async def create_job(
 
 from beanie import PydanticObjectId
 @router.get('.get_by_id', response_model=schemas.JobOut, response_model_by_alias=False)
-async def get_job_by_id(
+async def get_by_id(
     job_id: PydanticObjectId,
     current_user: User = Depends(get_current_user)
 ):

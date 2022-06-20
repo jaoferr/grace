@@ -12,7 +12,7 @@ from app.routers.api_v1.config import Config as api_v1_config
 from app.crud import users as crud_users
 from app.dependencies import get_tika_status
 from app.models import User
-from app.routers.api_v1 import auth, jobs, recommendation, resumes, users
+from app.routers.api_v1 import auth, jobs, recommendation, resumes, users, tags
 from app.schemas import user as schemas_users
 
 
@@ -31,6 +31,7 @@ def get_test_application():
     _app.include_router(resumes.router)
     _app.include_router(auth.router)
     _app.include_router(jobs.router)
+    _app.include_router(tags.router)
     _app.include_router(recommendation.router)
 
     return _app

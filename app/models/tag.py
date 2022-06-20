@@ -3,6 +3,8 @@ from typing import List
 
 from beanie import Document, Indexed, Link
 from beanie.odm.fields import PydanticObjectId
+from pymongo.operations import IndexModel
+from pymongo import DESCENDING
 
 from app.models.resume import Resume
 
@@ -16,3 +18,9 @@ class Tag(Document):
 
     class Settings:
         name = 'tags'
+        indexes = [
+            IndexModel(
+                [('name', DESCENDING), ('user_id', DESCENDING)],
+                unique=True
+            )
+        ]

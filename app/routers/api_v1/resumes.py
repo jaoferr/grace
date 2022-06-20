@@ -19,14 +19,14 @@ router = APIRouter(
 )
 
 @router.get('.from_current_user', response_model=list[schemas.resume.Resume])
-async def get_resumes_from_current_user(
+async def get_from_current_user(
     skip: int = 0, limit: int = 20,
     current_user: User = Depends(get_current_user),
 ):
     return await crud_resumes.get_owned_by_user(user_id=current_user.id, skip=skip, limit=limit)    
 
 @router.get('.get_by_id', response_model=schemas.Resume)
-async def get_resume(
+async def get_by_id(
     resume_id: int,
     current_user: User = Depends(get_current_user)
 ):
@@ -36,7 +36,7 @@ async def get_resume(
     return resume
 
 @router.get('.get_file_by_id')
-async def get_resume_file(
+async def get_file_by_id(
     resume_id: int,
     current_user: User = Depends(get_current_user),
 ):
@@ -46,8 +46,8 @@ async def get_resume_file(
     response = FileResponse(path=resume.filename, filename=os.path.basename(resume.filename))
     return response
 
-@router.post('.ingest', status_code=202)
-async def ingest_resume(
+@router.post('.ingest')
+async def ingest(
     # background_tasks: BackgroundTasks,
     # file: UploadFile, 
     # tag_name: str = Form(...),
@@ -84,8 +84,8 @@ async def ingest_resume(
     return HTTPException(501, 'Not implemented')
 
 
-@router.post('.by_tag_id', response_model=list[schemas.Tag])
-async def get_resumes_by_tag(
+@router.post('.by_tag_id', response_model=list[schemas.TagOut])
+async def get_by_tag_id(
     tag_id: str, skip: int = 0, limit: int = 100,
     current_user: User = Depends(get_current_user)
     ):
@@ -95,7 +95,7 @@ async def get_resumes_by_tag(
     return resumes[skip:limit]
 
 @router.post('.update', response_model=schemas.Resume)
-def update_resume(
+def update(
     resume: schemas.ResumeUpdate,
     current_user: User = Depends(get_current_user)
     ) -> None:
@@ -110,7 +110,7 @@ def update_resume(
     raise HTTPException(501, 'Not implemented')
 
 @router.post('.delete', response_model=schemas.ResumeDelete)
-def delete_resume(
+def delete(
     resume_id: int,
     current_user: User = Depends(get_current_user)
 ) -> None:
@@ -126,5 +126,5 @@ def delete_resume(
     raise HTTPException(501, 'Not implemented')
 
 @router.post('.delete_all')
-def delete_all_resumes():
+def delete_all():
     raise HTTPException(501, 'Not implemented')

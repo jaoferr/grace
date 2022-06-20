@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from beanie.odm.fields import PydanticObjectId
 
 from app import schemas
 from app.models import User
@@ -14,14 +15,14 @@ router = APIRouter(
 )
 
 @router.post('.get_by_id', response_model=schemas.UserOut, response_model_by_alias=False)
-async def get_user(user_id: str):
+async def get_by_id(user_id: PydanticObjectId):
     if (user := await crud_users.get_by_id(user_id=user_id)) is None:
         raise HTTPException(404, 'user not found')
     
     return user
 
 @router.post('.create', response_model=schemas.UserOut, response_model_by_alias=False)
-async def create_user(user: schemas.UserCreate):
+async def create(user: schemas.UserCreate):
     create_result = await crud_users.create_user(user)
 
     if isinstance(create_result, User):  # if create is successful, return newly created user

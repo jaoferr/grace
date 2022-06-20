@@ -7,10 +7,17 @@ from app import schemas
 from app.models import Tag
 
 
+async def get_by_id(tag_id: PydanticObjectId) -> Tag:
+    return await Tag.find_one(Tag.id == tag_id)
+
+async def get_by_id_and_user(tag_id: PydanticObjectId, user_id: PydanticObjectId) -> Tag:
+    tag = await Tag.find_one(Tag.id == tag_id, Tag.user_id == user_id)
+    return tag
+
 async def get_by_query(query: schemas.TagQuery) -> Tag:
     return await Tag.find_one(query)
 
-async def get_owned_by_user(user_id: int, skip: int, limit: int) -> list[Tag]:
+async def get_owned_by_user(user_id: PydanticObjectId, skip: int, limit: int) -> list[Tag]:
     return await Tag.find_many(Tag.user_id == user_id) \
         .skip(skip).limit(limit) \
         .to_list()
@@ -29,5 +36,6 @@ async def create_tag(new_tag: schemas.TagCreate) -> Union[Tag, str]:
 
     try:
         return await tag_db.create()
+
     except DuplicateKeyError:
         return 'tag already exists'
