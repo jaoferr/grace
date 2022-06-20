@@ -1,13 +1,6 @@
-import pathlib
-
 import pytest
-from fastapi.encoders import jsonable_encoder
 
 from app.models import User
-from app.crud import resumes as crud_resumes
-from app.crud import tags as crud_tags
-from app.schemas import resume as resume_schema
-from app.schemas import tag as tag_schema
 from tests.api_v1.conftest import AsyncClient, api_v1_config
 
 PREFIX = api_v1_config.PREFIX + '/resumes'
