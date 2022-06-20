@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.routers.api_v1 import auth, jobs, recommendation, resumes, tags, users
-from app.core.database import init_db, get_motor_client
+from app.core.database import init_db, get_motor_client, init_defaults
 
 def get_application():
     _app = FastAPI(title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION)
@@ -19,10 +19,10 @@ def get_application():
     )
 
     _app.include_router(users.router)
-    _app.include_router(resumes.router)
+    # _app.include_router(resumes.router)
     _app.include_router(auth.router)
     _app.include_router(jobs.router)
-    _app.include_router(recommendation.router)
+    # _app.include_router(recommendation.router)
     _app.include_router(tags.router)
 
 
@@ -32,8 +32,9 @@ app = get_application()
 
 @app.on_event('startup')
 async def app_init():
-    db_client = await get_motor_client()
+    db_client = get_motor_client()
     await init_db(db_client)
+    await init_defaults()
 
     if not os.path.exists(settings.Hardcoded.DATA_PATH):
         os.makedirs(settings.Hardcoded.DATA_PATH)

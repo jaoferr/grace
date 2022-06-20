@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from app import schemas
+from app.models import User
 from app.crud import users as crud_users
 from app.routers.api_v1.config import Config
 
@@ -21,8 +22,9 @@ async def get_user(user_id: str):
 
 @router.post('.create', response_model=schemas.UserOut, response_model_by_alias=False)
 async def create_user(user: schemas.UserCreate):
-    if (db_user := await crud_users.get_by_email(user.email)):
-        raise HTTPException(status_code=400, detail='email already in use')
-   
-    new_user = await crud_users.create_user(user)
-    return new_user
+    create_result = await crud_users.create_user(user)
+
+    if isinstance(create_result, User):  # if create is successful, return newly created user
+        return create_result
+    else:  # else, return error message, defined in crud.create_user
+        raise HTTPException(status_code=409, detail=create_result)

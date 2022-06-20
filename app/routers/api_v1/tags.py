@@ -13,13 +13,13 @@ router = APIRouter(
     }
 )
 
-@router.post('.from_user/{user_id}', response_model=list[schemas.ResumeTag])
+@router.post('.from_user/{user_id}', response_model=list[schemas.Tag])
 def get_resumes_from_user(user_id: int, skip: int = 0, limit: int = 20):
     # tags = crud_tags.get_tags_by_user_id(db, user_id, skip=skip, limit=limit)
     # return tags
     raise HTTPException(501, 'Not implemented')
 
-@router.post('.from_current_user', response_model=list[schemas.ResumeTag])
+@router.post('.from_current_user', response_model=list[schemas.Tag])
 def get_resumes_from_current_user(
     skip: int = 0, limit: int = 20,
     current_user: models.User = Depends(get_current_user),
@@ -28,9 +28,9 @@ def get_resumes_from_current_user(
     # return resumes
     raise HTTPException(501, 'Not implemented')
 
-@router.post('.create', response_model=schemas.ResumeTag)
+@router.post('.create', response_model=schemas.Tag)
 async def create_resume_tag(
-    form_data: schemas.ResumeTagCreateExternal, 
+    form_data: schemas.TagCreateExternal, 
     current_user: models.User = Depends(get_current_user),
 ):
     # new_tag = schemas.ResumeTagCreate(
@@ -42,7 +42,7 @@ async def create_resume_tag(
     #     return tag_db
     raise HTTPException(501, 'Not implemented')
 
-@router.get('.tag/{tag}', response_model=schemas.ResumeTag)
+@router.get('.tag/{tag}', response_model=schemas.Tag)
 def get_resumes_by_tag(
     tag: str, skip: int = 0, limit: int = 100,
     current_user: models.User = Depends(get_current_user)

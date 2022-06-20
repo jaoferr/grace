@@ -58,7 +58,7 @@ async def generic_user() -> AsyncGenerator[User, None]:
     user = schemas_users.UserCreate(
         username='generic_user', email='generic@email.com', password='generic_password'
     )
-    db_user = await  crud_users.create_user(user)
+    db_user = await crud_users.create_user(user)
     yield db_user
 
 @pytest.mark.asyncio

@@ -1,3 +1,5 @@
+from pymongo.errors import DuplicateKeyError
+
 from app import schemas
 from app.models import User
 from app.auth.token import get_password_hash
@@ -18,5 +20,8 @@ async def create_user(new_user: schemas.UserCreate):
         password=await get_password_hash(new_user.password)
     )
 
-    await user_in_db.create()
-    return user_in_db
+    try:
+        return await user_in_db.create()
+
+    except DuplicateKeyError:
+        return 'email already in use'

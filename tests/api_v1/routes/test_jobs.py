@@ -62,15 +62,13 @@ async def test_get_job_fail(
     assert response.status_code == 404
     assert response_json.get('detail') == 'job not found'
 
-# def test_get_current_user_jobs(
-#     client: TestClient, current_user: User,
-#     db_session: Session
-# ):
+# @pytest.mark.asyncio
+# async def test_get_current_user_jobs(client: AsyncClient, current_user: User):
 #     for i in range(3):
 #         job = jobs_schema.JobCreate(name=f"test job name-{i}", description=f'job-{i}', user_id=current_user.id)
-#         db_job = crud_jobs.create_job(db_session, job)
+#         db_job = await crud_jobs.create_job(job)
         
-#     response = client.get(
+#     response = await client.get(
 #         url=PREFIX + '.from_current_user'
 #     )
 #     response_json = response.json()

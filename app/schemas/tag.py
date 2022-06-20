@@ -2,33 +2,28 @@ from typing import List, Optional
 from datetime import datetime
 
 from pydantic import BaseModel
+from beanie.odm.fields import PydanticObjectId
 
-from app.schemas import Resume
 
-
-class ResumeTagBase(BaseModel):
-    user_id: int
+class TagBase(BaseModel):
+    user_id: PydanticObjectId
     name: str
     description: Optional[str]
 
-class ResumeTagQuery(ResumeTagBase):
+class TagQuery(TagBase):
     pass
 
-class ResumeTagCreateExternal(BaseModel):
+class TagCreateExternal(BaseModel):
     name: str
     description: Optional[str]
 
-class ResumeTagCreate(ResumeTagBase):
+class TagCreate(TagBase):
     pass
 
-class ResumeTag(ResumeTagBase):
-    id: int
-    # resumes: List[Resume]
+class Tag(TagBase):
+    id: PydanticObjectId
     name: str
     description: Optional[str]
     timestamp: datetime
     resume_count: int
     disk_size: int
-
-    class Config:
-        orm_mode = True

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.models import User
+from app.models import User, Job
 from app import schemas
 from app.auth.token import get_current_user
 from app.crud import jobs as crud_jobs
@@ -29,18 +29,19 @@ async def create_job(
     new_job: schemas.JobCreateExternal, 
     current_user: User = Depends(get_current_user)
 ):
-    db_job = await crud_jobs.create_job(
+    create_result = await crud_jobs.create_job(
         schemas.JobCreate(user_id=current_user.id, **new_job.dict())
     )
 
-    if db_job is None:
-        raise HTTPException(status_code=400, detail='job already exists')
+    if isinstance(create_result, Job):
+        return create_result
+    else:
+        raise HTTPException(status_code=409, detail=create_result)
 
-    return db_job
-
+from beanie import PydanticObjectId
 @router.get('.get_by_id', response_model=schemas.JobOut, response_model_by_alias=False)
 async def get_job_by_id(
-    job_id: str,
+    job_id: PydanticObjectId,
     current_user: User = Depends(get_current_user)
 ):
     if not (job := await crud_jobs.get_by_id_and_user(job_id, current_user.id)):

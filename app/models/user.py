@@ -1,18 +1,16 @@
 from typing import List, Optional
 
-from pydantic import Field
 from beanie import Document, Indexed, Link
 
-from app.models.resume import Resume
+from app.models.job import Job
 from app.models.tag import Tag
 
 class User(Document):
-
-    email: str
+    email: Indexed(str, unique=True)
     username: Indexed(str)
     password: str
-    resumes: Optional[List[Link[Resume]]] = []
+    jobs: Optional[List[Link[Job]]] = []
     tags: Optional[List[Link[Tag]]] = []
-    
+
     class Settings:
         name = 'users'

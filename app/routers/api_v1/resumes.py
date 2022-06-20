@@ -84,7 +84,7 @@ async def ingest_resume(
     return HTTPException(501, 'Not implemented')
 
 
-@router.post('.by_tag_id', response_model=list[schemas.ResumeTag])
+@router.post('.by_tag_id', response_model=list[schemas.Tag])
 async def get_resumes_by_tag(
     tag_id: str, skip: int = 0, limit: int = 100,
     current_user: User = Depends(get_current_user)

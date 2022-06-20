@@ -30,7 +30,7 @@ async def test_create_user_already_exists(client: AsyncClient):
         url=PREFIX + '.create', json=data
     )
     
-    assert response.status_code == 400
+    assert response.status_code == 409
 
 @pytest.mark.asyncio
 async def test_get_user(client: AsyncClient):
