@@ -7,7 +7,7 @@ from httpx import AsyncClient
 
 from app.auth.token import get_current_user
 from app.core.config import settings
-from app.core.database import init_db
+from app.core.database import init_db, get_motor_client
 from app.routers.api_v1.config import Config as api_v1_config
 from app.crud import users as crud_users
 from app.dependencies import get_tika_status
@@ -41,16 +41,16 @@ def app() -> Generator[FastAPI, Any, None]:
 
     yield _app
 
-from mongomock_motor import AsyncMongoMockClient
 @pytest.mark.asyncio
 @pytest.fixture(scope='function')
-async def client(app: FastAPI) -> AsyncGenerator[Any, AsyncMongoMockClient]:
-    db_client = AsyncMongoMockClient()
-    
+async def client(app: FastAPI) -> AsyncGenerator[Any, AsyncClient]:
+    db_client = get_motor_client()
     await init_db(db_client, database_name='testing')
 
     async with AsyncClient(app=app, base_url='http://localhost:8000') as client:
         yield client    
+
+    db_client.drop_database('testing')
 
 @pytest.mark.asyncio
 @pytest.fixture(scope='function')
