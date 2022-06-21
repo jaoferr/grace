@@ -3,7 +3,7 @@ from beanie.odm.fields import PydanticObjectId
 
 from app import schemas
 from app.models import User
-from app.crud import users as crud_users
+from app.crud import user as crud_users
 from app.routers.api_v1.config import Config
 
 router = APIRouter(

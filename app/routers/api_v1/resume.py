@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 from app import schemas
 from app.models import User
 from app.services.auth.token import get_current_user
-from app.crud import resumes as crud_resumes
+from app.crud import resume as crud_resumes
 from app.routers.api_v1.config import Config
 
 

@@ -4,7 +4,7 @@ import pytest
 from fastapi.encoders import jsonable_encoder
 from beanie.odm.fields import PydanticObjectId
 
-from app.crud import jobs as crud_jobs
+from app.crud import job as crud_jobs
 from app.models import User
 from app.schemas import job as jobs_schema
 from tests.api_v1.conftest import AsyncClient, api_v1_config

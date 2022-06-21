@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.logging import logger
-from app.crud import batches, resumes, tags
+from app.crud import batches, resume, tag
 from app.engines.ingesting.engine import IngestingEngine
 from app.models import models
 from app.schemas import BatchCreate, ResumeCreate, ResumeTagCreate
@@ -25,7 +25,7 @@ def task(
     batch_id: str, tag_name: str, 
     engine: IngestingEngine, db: Session
 ):
-    tag = tags.create_tag(
+    tag = tag.create_tag(
         db, ResumeTagCreate(
             user_id=user.id, 
             name=tag_name
@@ -48,7 +48,7 @@ def task(
             
             zip.extract(file, batch_dir)
             
-            resumes.create_resume(
+            resume.create_resume(
                 db,
                 ResumeCreate(
                     user_id=user.id, filename=filepath,

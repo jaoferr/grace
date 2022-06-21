@@ -9,9 +9,9 @@ from app.services.auth.token import get_current_user
 from app.core.config import settings
 from app.core.database import init_db, get_motor_client
 from app.routers.api_v1.config import Config as api_v1_config
-from app.crud import users as crud_users
+from app.crud import user as crud_users
 from app.models import User
-from app.routers.api_v1 import auth, jobs, recommendation, resumes, users, tags
+from app.routers.api_v1 import auth, job, recommendation, resume, tag, user
 from app.schemas import user as schemas_users
 
 
@@ -26,11 +26,11 @@ def get_test_application():
         allow_headers=["*"],
     )
 
-    _app.include_router(users.router)
-    _app.include_router(resumes.router)
+    _app.include_router(user.router)
+    _app.include_router(resume.router)
     _app.include_router(auth.router)
-    _app.include_router(jobs.router)
-    _app.include_router(tags.router)
+    _app.include_router(job.router)
+    _app.include_router(tag.router)
     _app.include_router(recommendation.router)
 
     return _app

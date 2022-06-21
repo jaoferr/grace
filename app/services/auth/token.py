@@ -30,7 +30,7 @@ async def verify_password(plain_password: str, hashed_password: str):
 async def get_password_hash(password: str):
     return pwd_context.hash(password)
 
-from app.crud import users as crud_users
+from app.crud import user as crud_users
 
 async def authenticate_user(username: str, password: str):
     if not (user := await crud_users.get_by_username(username)):

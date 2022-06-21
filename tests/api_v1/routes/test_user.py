@@ -3,7 +3,7 @@ from fastapi.encoders import jsonable_encoder
 from httpx import AsyncClient
 from beanie.odm.fields import PydanticObjectId
 
-from app.crud import users as crud_users
+from app.crud import user as crud_users
 from app.schemas import user as user_schema
 from tests.api_v1.conftest import api_v1_config
 

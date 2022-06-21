@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.routers.api_v1 import auth, jobs, recommendation, resumes, tags, users
+from app.routers.api_v1 import auth, job, recommendation, resume, tag, user
 from app.core.database import init_db, get_motor_client, init_defaults
 
 def get_application():
@@ -18,12 +18,12 @@ def get_application():
         allow_headers=["*"],
     )
 
-    _app.include_router(users.router)
+    _app.include_router(user.router)
     # _app.include_router(resumes.router)
     _app.include_router(auth.router)
-    _app.include_router(jobs.router)
+    _app.include_router(job.router)
     # _app.include_router(recommendation.router)
-    _app.include_router(tags.router)
+    _app.include_router(tag.router)
 
 
     return _app
