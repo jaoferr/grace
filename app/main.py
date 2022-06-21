@@ -42,17 +42,21 @@ async def app_init():
 # temporary
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException
 
-from app.core.logging import logger
+from app.utils.app_exceptions import GenericAppException
+from app.utils.request_exceptions import (
+    generic_http_exception_handler,
+    request_validation_exception_handler
+)
 
+@app.exception_handler(HTTPException)
+async def custom_http_exception_handler(request: HTTPException, exc):
+    return await custom_http_exception_handler(request, exc)
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    exc_str = f'{exc}'.replace('\n', ' ').replace('   ', ' ')
-    logger.error(f'{request}: {exc_str}')
-    response = {'status_code': 422, 'detail': exc_str, 'data': str(request.__dict__)}
-    return JSONResponse(content=response, status_code=422)
+async def custom_validation_exception_handler(request: Request, exc: RequestValidationError):
+    return await request_validation_exception_handler(request, exc)
 
 if __name__ == '__main__':
     import uvicorn
