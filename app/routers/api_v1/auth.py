@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app import schemas
-from app.auth.config import auth_settings
-from app.auth.token import (
+from app.services.auth.config import auth_settings
+from app.services.auth.token import (
     Token,
     authenticate_user,
     create_access_token,

@@ -5,12 +5,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from httpx import AsyncClient
 
-from app.auth.token import get_current_user
+from app.services.auth.token import get_current_user
 from app.core.config import settings
 from app.core.database import init_db, get_motor_client
 from app.routers.api_v1.config import Config as api_v1_config
 from app.crud import users as crud_users
-from app.dependencies import get_tika_status
 from app.models import User
 from app.routers.api_v1 import auth, jobs, recommendation, resumes, users, tags
 from app.schemas import user as schemas_users
@@ -78,10 +77,3 @@ def current_user(app: FastAPI, generic_user: User) -> User:
 
     app.dependency_overrides[get_current_user] = get_test_current_user
     return get_test_current_user()
-
-@pytest.fixture(scope='function')
-def tika_status_false(app: FastAPI):
-    def fake_tika_status():
-        return False
-
-    app.dependency_overrides[get_tika_status] = fake_tika_status

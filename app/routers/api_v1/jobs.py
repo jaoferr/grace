@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.models import User, Job
 from app import schemas
-from app.auth.token import get_current_user
+from app.services.auth.token import get_current_user
 from app.crud import jobs as crud_jobs
 from app.routers.api_v1.config import Config
 

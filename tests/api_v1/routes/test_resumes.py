@@ -14,7 +14,7 @@ async def test_resume_ingest_invalid_file_type(client: AsyncClient, current_user
     assert 202 == 503
 
 @pytest.mark.asyncio
-async def test_resume_tika_status(client: AsyncClient, current_user: User, tika_status_false: bool):
+async def test_resume_tika_status(client: AsyncClient, current_user: User):
     assert 202 == 503
 
 @pytest.mark.asyncio

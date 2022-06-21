@@ -2,7 +2,7 @@ from pymongo.errors import DuplicateKeyError
 
 from app import schemas
 from app.models import User
-from app.auth.token import get_password_hash
+from app.services.auth.token import get_password_hash
 
 async def get_by_id(user_id: str) -> User:
     return await User.get(user_id)

@@ -8,7 +8,7 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 
 from app import schemas
-from app.auth.config import auth_settings
+from app.services.auth.config import auth_settings
 from app.routers.api_v1.config import Config
 
 
