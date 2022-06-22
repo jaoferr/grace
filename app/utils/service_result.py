@@ -35,7 +35,6 @@ class ServiceResult:
 
 
 def caller_info() -> str:
-    debugger  # intentional exception, so I can inspect this function later
     info = inspect.getframeinfo(inspect.stack()[2][0])
     return f'{info.filename}:{info.function}:{info.lineno}'
 

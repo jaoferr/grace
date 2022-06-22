@@ -1,8 +1,9 @@
+from fastapi import Depends
 from pymongo.errors import DuplicateKeyError
 
 from app import schemas
 from app.models import User
-from app.services.auth.token import get_password_hash
+from app.services.auth import AuthService
 
 async def get_by_id(user_id: str) -> User:
     return await User.get(user_id)
@@ -13,11 +14,14 @@ async def get_by_username(username: str) -> User:
 async def get_by_email(email: str) -> User:
     return await User.find_one(User.email == email)
 
-async def create_user(new_user: schemas.UserCreate):
+async def create_user(
+    new_user: schemas.UserCreate,
+    auth_service: AuthService = Depends()
+):
     user_in_db = User(
         email=new_user.email,
         username=new_user.username,
-        password=await get_password_hash(new_user.password)
+        password=await auth_service.get_password_hash(new_user.password)
     )
 
     try:
