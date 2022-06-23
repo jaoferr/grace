@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from app import models, schemas
-from app.services.auth.token import get_current_user
+from app.services.auth import get_current_user
 from app.routers.api_v1.config import Config
 
 

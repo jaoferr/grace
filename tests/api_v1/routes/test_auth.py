@@ -1,6 +1,7 @@
 import pytest
 
 from app.crud import user as crud_users
+from app.services.user import UserService
 from app.schemas import user as user_schema
 from tests.api_v1.conftest import AsyncClient, api_v1_config
 
@@ -8,10 +9,11 @@ PREFIX = api_v1_config.PREFIX + '/auth'
 
 @pytest.mark.asyncio
 async def test_login(client: AsyncClient):
-    user = user_schema.UserCreate(
+    user = user_schema.UserCreateExternal(
         username='testuser', email='testuser@domain.com', password='testpassword'
     )
-    db_user = await crud_users.create_user(user)
+    db_user = await UserService().create_user(user)
+    db_user = db_user.value
 
     data = {'username': db_user.username, 'password': 'testpassword'}
     response = await client.post(
@@ -25,10 +27,11 @@ async def test_login(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_login_incorrect_password(client: AsyncClient):
-    user = user_schema.UserCreate(
+    user = user_schema.UserCreateExternal(
         username='testuser', email='testuser@domain.com', password='testpassword'
     )
-    db_user = await crud_users.create_user(user)
+    db_user = await UserService().create_user(user)
+    db_user = db_user.value
 
     data = {'username': db_user.username, 'password': 'wrongtestpassword'}
     response = await client.post(
@@ -41,11 +44,12 @@ async def test_login_incorrect_password(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_get_me(client: AsyncClient):
-    user = user_schema.UserCreate(
+    user = user_schema.UserCreateExternal(
         username='testuser', email='testuser@domain.com', password='testpassword'
     )
-    db_user = await crud_users.create_user(user)
-
+    db_user = await UserService().create_user(user)
+    db_user = db_user.value
+    
     data = {'username': db_user.username, 'password': 'testpassword'}
     login_response = await client.post(
         url=PREFIX + '.login', data=data

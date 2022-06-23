@@ -1,4 +1,5 @@
 import pytest
+import pytest_asyncio
 from fastapi.encoders import jsonable_encoder
 from httpx import AsyncClient
 from beanie.odm.fields import PydanticObjectId
@@ -18,6 +19,7 @@ async def test_create_user(client: AsyncClient):
     response = await client.post(
         url=PREFIX + '.create', json=data
     )
+
     assert response.status_code == 200
     assert response.json()['email'] == user.email
 
@@ -29,8 +31,10 @@ async def test_create_user_already_exists(client: AsyncClient):
     response = await client.post(
         url=PREFIX + '.create', json=data
     )
+    response_json = response.json()
     
     assert response.status_code == 409
+    assert response_json.get('detail') == 'email already in use'
 
 @pytest.mark.asyncio
 async def test_get_user(client: AsyncClient):
@@ -55,5 +59,7 @@ async def test_get_user_404(client: AsyncClient):
     response = await client.post(
         url=PREFIX + '.get_by_id', params={'user_id': str(oid)}
     )
+    response_json = response.json()
 
     assert response.status_code == 404
+    assert response_json.get('detail') == 'user not found'

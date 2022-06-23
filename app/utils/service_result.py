@@ -33,7 +33,6 @@ class ServiceResult:
     def __exit__(self, *kwargs):
         pass
 
-
 def caller_info() -> str:
     info = inspect.getframeinfo(inspect.stack()[2][0])
     return f'{info.filename}:{info.function}:{info.lineno}'

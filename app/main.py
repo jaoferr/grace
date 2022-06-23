@@ -44,7 +44,7 @@ from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
 
-from app.utils.app_exceptions import GenericAppException
+from app.utils.app_exceptions import GenericAppException, generic_app_exception_handler
 from app.utils.request_exceptions import (
     generic_http_exception_handler,
     request_validation_exception_handler
@@ -52,11 +52,15 @@ from app.utils.request_exceptions import (
 
 @app.exception_handler(HTTPException)
 async def custom_http_exception_handler(request: HTTPException, exc):
-    return await custom_http_exception_handler(request, exc)
+    return await generic_http_exception_handler(request, exc)
 
 @app.exception_handler(RequestValidationError)
 async def custom_validation_exception_handler(request: Request, exc: RequestValidationError):
     return await request_validation_exception_handler(request, exc)
+
+@app.exception_handler(GenericAppException)
+async def custom_app_exception_handler(request, e):
+    return await generic_app_exception_handler(request, e)
 
 if __name__ == '__main__':
     import uvicorn

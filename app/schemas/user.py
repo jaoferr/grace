@@ -7,6 +7,10 @@ class UserBase(BaseModel):
     email: str
 
 
+class UserCreateExternal(UserBase):
+    password: str
+
+
 class UserCreate(UserBase):
     password: str
 

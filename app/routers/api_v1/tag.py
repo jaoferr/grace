@@ -4,7 +4,7 @@ from beanie.odm.fields import PydanticObjectId
 from app import schemas
 from app.models import User, Tag
 from app.crud import tag as crud_tags
-from app.services.auth.token import get_current_user
+from app.services.auth import get_current_user
 from app.routers.api_v1.config import Config
 
 
