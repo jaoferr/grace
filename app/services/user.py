@@ -39,6 +39,7 @@ class UserService(GenericAppService):
             user = await crud_user.get_by_email(email)
             
         if not user:
-            return ServiceResult(AppException.EntryNotFound({'detail': 'user not found'}, is_public=True))
+            context = {'detail': 'user not found'}
+            return ServiceResult(AppException.EntryNotFound(context))
 
         return ServiceResult(user)

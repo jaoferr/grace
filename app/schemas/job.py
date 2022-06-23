@@ -16,6 +16,7 @@ class JobCreate(JobBase):
     user_id: PydanticObjectId
     description: str
 
+
 class JobCreateExternal(JobBase):
     description: str
 

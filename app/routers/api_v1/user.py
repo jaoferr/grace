@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from beanie.odm.fields import PydanticObjectId
 
 from app import schemas

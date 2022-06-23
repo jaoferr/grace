@@ -10,6 +10,6 @@ async def get_by_username(username: str) -> User:
 async def get_by_email(email: str) -> User:
     return await User.find_one(User.email == email)
 
-async def create_user(new_user: schemas.UserCreate):
+async def create_user(new_user: schemas.UserCreate) -> User:
     user_in_db = User(**new_user.dict())
     return await user_in_db.create()
