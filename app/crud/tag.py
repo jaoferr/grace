@@ -1,17 +1,14 @@
-from typing import Union
-
-from pymongo.errors import DuplicateKeyError
 from beanie.odm.fields import PydanticObjectId
 
 from app import schemas
 from app.models import Tag
 
 
-async def get_by_id(tag_id: PydanticObjectId) -> Tag:
-    return await Tag.find_one(Tag.id == tag_id)
+async def get_by_id(id: PydanticObjectId) -> Tag:
+    return await Tag.find_one(Tag.id == id)
 
-async def get_by_id_and_user(tag_id: PydanticObjectId, user_id: PydanticObjectId) -> Tag:
-    tag = await Tag.find_one(Tag.id == tag_id, Tag.user_id == user_id)
+async def get_by_id_and_user(id: PydanticObjectId, user_id: PydanticObjectId) -> Tag:
+    tag = await Tag.find_one(Tag.id == id, Tag.user_id == user_id)
     return tag
 
 async def get_by_query(query: schemas.TagQuery) -> Tag:
@@ -22,20 +19,10 @@ async def get_owned_by_user(user_id: PydanticObjectId, skip: int, limit: int) ->
         .skip(skip).limit(limit) \
         .to_list()
 
-async def get_by_user_and_name(tag_name: str, user_id: PydanticObjectId) -> Tag:
-    tag = await Tag.find_one(Tag.name == tag_name, Tag.user_id == user_id)
+async def get_by_user_and_name(name: str, user_id: PydanticObjectId) -> Tag:
+    tag = await Tag.find_one(Tag.name == name, Tag.user_id == user_id)
     return tag
 
-async def create_tag(new_tag: schemas.TagCreate) -> Union[Tag, str]:
-    tag_db = Tag(
-        name=new_tag.name,
-        description=new_tag.description,
-        user_id=new_tag.user_id,
-        resumes=[]
-    )
-
-    try:
-        return await tag_db.create()
-
-    except DuplicateKeyError:
-        return 'tag already exists'
+async def create_tag(new_tag: schemas.TagCreate) -> Tag:
+    tag_db = Tag(**new_tag.dict())
+    return await tag_db.create()
