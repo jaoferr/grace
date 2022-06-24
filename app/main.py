@@ -19,7 +19,7 @@ def get_application():
     )
 
     _app.include_router(user.router)
-    # _app.include_router(resumes.router)
+    _app.include_router(resume.router)
     _app.include_router(auth.router)
     _app.include_router(job.router)
     # _app.include_router(recommendation.router)

@@ -13,8 +13,9 @@ from app.core.config import settings
 from app.core.database import init_db, get_motor_client
 from app.routers.api_v1.config import Config as api_v1_config
 from app.crud import user as crud_users
-from app.models import User
-from app.schemas import user as schemas_users
+from app.crud import tag as crud_tags
+from app.models import User, Tag
+from app import schemas
 from app.utils.app_exceptions import GenericAppException, generic_app_exception_handler
 from app.utils.request_exceptions import (
     generic_http_exception_handler,
@@ -55,7 +56,7 @@ async def client(app: FastAPI) -> AsyncGenerator[Any, AsyncClient]:
 
 @pytest_asyncio.fixture(scope='function')
 async def generic_user() -> AsyncGenerator[User, None]:
-    user = schemas_users.UserCreate(
+    user = schemas.UserCreate(
         username='generic_user', email='generic@email.com', password='generic_password'
     )
     db_user = await crud_users.create_user(user)
@@ -63,8 +64,10 @@ async def generic_user() -> AsyncGenerator[User, None]:
 
 @pytest_asyncio.fixture(scope='function')
 async def second_generic_user() -> AsyncGenerator[User, None]:
-    user = schemas_users.UserCreate(
-        username='generic_second_user', email='generic_second_user@email.com', password='generic_password'
+    user = schemas.UserCreate(
+        username='generic_second_user', 
+        email='generic_second_user@email.com',
+        password='generic_password'
     )
     db_user = await crud_users.create_user(user)
     yield db_user
@@ -76,3 +79,13 @@ def current_user(app: FastAPI, generic_user: User) -> User:
 
     app.dependency_overrides[get_current_user] = get_test_current_user
     return get_test_current_user()
+
+@pytest_asyncio.fixture(scope='function')
+async def generic_tag(current_user: User) -> AsyncGenerator[Tag, None]:
+    tag = schemas.TagCreate(
+        user_id=current_user.id,
+        name='generic tag name',
+        description='generic tag description'
+    )
+    db_tag = await crud_tags.create_tag(tag)
+    yield db_tag

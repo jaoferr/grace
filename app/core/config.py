@@ -55,6 +55,10 @@ class Settings(BaseSettings):
         conn_string = f'{self.NOSQL_DRIVER}://{self.NOSQL_USER}:{self.NOSQL_PASSWORD}@{self.NOSQL_HOST}:{self.NOSQL_PORT}'
         return conn_string
 
+    def assemble_tika_endpoint(self):
+        endpoint = f'{self.TIKA_ADAPTER}://{self.TIKA_HOST}:{self.TIKA_HOST}'
+        return endpoint
+
 
 settings = Settings()
 

@@ -1,12 +1,13 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
+from fastapi import Form
 from pydantic import BaseModel
-
+from beanie.odm.fields import PydanticObjectId
 
 class ResumeBase(BaseModel):
-    object_id: Optional[str]
-
+    pass
+  
 
 class ResumeCreate(ResumeBase):
     user_id: int
@@ -14,11 +15,6 @@ class ResumeCreate(ResumeBase):
     filename: str
     content: Dict[Any, Any]
 
-
-class ResumeUpdate(BaseModel):
-    id: int
-    tag_id: int
-    content: Optional[Dict[Any, Any]]
 
 
 class ResumeDelete(BaseModel):
@@ -32,18 +28,10 @@ class Resume(ResumeBase):
     tag_id: int
     timestamp: datetime
     filename: str
-    batch_id: str
     content: Optional[Dict[Any, Any]]
 
     class Config:
         orm_mode = True
-
-
-class ResumeBatch(BaseModel):
-    user_id: int
-    resume_count: int
-    tag: str
-    files: List[Resume]
 
 
 class ResumeContent(BaseModel):
