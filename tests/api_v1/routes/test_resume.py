@@ -15,13 +15,13 @@ async def test_resume_ingest(
     current_user: User,
     generic_tag: Tag
 ):
-
     data = {'tag_id': str(generic_tag.id)}
     fake_zip = BytesIO()
     with ZipFile(fake_zip, 'a') as zip_file:
         for i in range(3):
-            fake_pdf = (f'fake_resume{i}.txt', BytesIO(f'fake resume number {i}'.encode('utf-8')))
-            zip_file.writestr(fake_pdf[0], fake_pdf[1].getvalue())
+            fake_filename = f'fake_resume{i}.txt'
+            fake_bytes = BytesIO(f'fake resume number {i}'.encode('utf-8'))
+            zip_file.writestr(fake_filename, fake_bytes.getvalue())
 
     files={'file': ('filename', fake_zip, 'application/zip')}
 
@@ -34,18 +34,18 @@ async def test_resume_ingest(
     assert response_json.get('detail') == ''
     assert PydanticObjectId.is_valid((response_json.get('task_id')))
 
-@pytest.mark.asyncio
-async def test_resume_ingest_invalid_file_type(client: AsyncClient, current_user: User):
-    assert 202 == 503
+# @pytest.mark.asyncio
+# async def test_resume_ingest_invalid_file_type(client: AsyncClient, current_user: User):
+#     assert 202 == 503
 
-@pytest.mark.asyncio
-async def test_resume_tika_status(client: AsyncClient, current_user: User):
-    assert 202 == 503
+# @pytest.mark.asyncio
+# async def test_resume_tika_status(client: AsyncClient, current_user: User):
+#     assert 202 == 503
 
-@pytest.mark.asyncio
-async def test_delete_resume(client: AsyncClient, current_user: User, second_generic_user: User):
-    assert 202 == 503
+# @pytest.mark.asyncio
+# async def test_delete_resume(client: AsyncClient, current_user: User, second_generic_user: User):
+#     assert 202 == 503
 
-@pytest.mark.asyncio
-async def test_delete_resume_fail(client: AsyncClient, current_user: User, second_generic_user: User):
-    assert 202 == 503
+# @pytest.mark.asyncio
+# async def test_delete_resume_fail(client: AsyncClient, current_user: User, second_generic_user: User):
+#     assert 202 == 503

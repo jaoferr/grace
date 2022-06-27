@@ -48,7 +48,10 @@ class Settings(BaseSettings):
         ALLOWED_EXTENSIONS = [
             'pdf', # 'doc', 'docx', 'jpeg', 'jpg'
         ]
-        MAX_ZIP_FILE_SIZE = 1000 * 1e6  # 1GB
+        ALLOWED_CONTENT_TYPE = [
+            'application/x-zip-compressed', 'application/zip'
+        ]
+        MAX_ZIP_FILE_SIZE = 1.6e7 * 0.95  # 95% of 16MB in bytes
         DATA_PATH = os.path.join('app', 'data')
 
     def assemble_mongodb_conn_string(self):

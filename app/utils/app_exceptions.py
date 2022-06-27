@@ -43,16 +43,39 @@ class AppException:
     class Unauthorized(GenericAppException):
         def __init__(self, context: dict = {}, is_public: bool = True):
             status_code = 401
-            context['detail'] = 'unauthorized'
+            if not context:
+                context['detail'] = 'unauthorized'
             super().__init__(status_code, context, is_public)
             
     class InvalidCredentials(GenericAppException):
         def __init__(self, context: dict = {}, is_public: bool = True):
             status_code = 401
-            context['detail'] = 'invalid credentials'
+            if not context:
+                context['detail'] = 'invalid credentials'
             super().__init__(status_code, context, is_public)
 
     class Disabled(GenericAppException):
         def __init__(self, context: dict = {}, is_public: bool = True):
             status_code = 400
+            super().__init__(status_code, context, is_public)
+
+    class FileTooLarge(GenericAppException):
+        def __init__(self, context: dict = {}, is_public: bool = True):
+            status_code = 413
+            if not context:
+                context['detail'] = 'file size exceeds limit'
+            super().__init__(status_code, context, is_public)
+
+    class InvalidFileType(GenericAppException):
+        def __init__(self, context: dict = {}, is_public: bool = True):
+            status_code = 400
+            if not context:
+                context['detail'] = 'invalid file type'
+            super().__init__(status_code, context, is_public)
+
+    class Unavailable(GenericAppException):
+        def __init__(self, context: dict, is_public: bool = True):
+            status_code = 503
+            if not context:
+                context['detail'] = 'service is currently unavailable'
             super().__init__(status_code, context, is_public)
