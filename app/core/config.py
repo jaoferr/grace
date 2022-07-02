@@ -38,6 +38,10 @@ class Settings(BaseSettings):
     NOSQL_USER: str
     NOSQL_PASSWORD: str
 
+    # celery
+    CELERY_DRIVER: str
+    CELERY_HOST: str
+    CELERY_PORT: str
 
     class Config:
         case_sensitive = True
@@ -62,6 +66,9 @@ class Settings(BaseSettings):
         endpoint = f'{self.TIKA_ADAPTER}://{self.TIKA_HOST}:{self.TIKA_HOST}'
         return endpoint
 
+    def assemble_celery_broker_url(self):
+        url = f'{self.CELERY_DRIVER}://{self.CELERY_HOST}:{self.CELERY_PORT}/0'
+        return url
 
 settings = Settings()
 

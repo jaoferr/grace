@@ -2,13 +2,13 @@ version: "3.8"
 
 services:
   database:
-    image: mysql:8.0.28
+    image: mongo:4.2.12
     env_file:
-      - mysql.env
+      - mongodb.env
     ports:
-      - "3306:3306"
+      - "27017:27017"
     volumes:
-      - "app_db:/var/lib/mysql"
+      - "app_db:/data/db/"
 
   tika:
     image: apache/tika:2.3.0
@@ -27,21 +27,6 @@ services:
       - "8000:8000"
     volumes:
       - "app_data:/app/data"
-
-  phpmyadmin:
-    image: phpmyadmin
-    ports:
-      - "8001:80"
-    depends_on:
-      - database
-    links:
-      - database:database
-    environment:
-      - PMA_HOST=database
-      - PMA_PORT=3306
-      - PMA_ARBITRARY=1
-      - PMA_USER=admin 
-      - PMA_PASSWORD=admin
 
 volumes:
   app_data:

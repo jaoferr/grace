@@ -7,11 +7,12 @@ from app.utils.service_result import ServiceResult
 from app.utils.app_exceptions import AppException
 from app.utils.file_handling import validate_file_size, validate_content_type
 from app.core.worker import add_task
+from app.services.task import TaskService
 
 
 class ResumeService(GenericAppService):
  
-    async def process_file(
+    async def create_resumes(
         self,
         *,
         file: BinaryIO,
