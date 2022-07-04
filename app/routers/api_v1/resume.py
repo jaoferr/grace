@@ -23,7 +23,6 @@ router = APIRouter(
     }
 )
 
-
 @router.post('.ingest', response_model=None)
 async def ingest(
     # background_tasks: BackgroundTasks,
@@ -60,10 +59,10 @@ async def ingest(
     # await file.close()
 
     # return {'detail': 'task was added to queue'}
-    result = await resume_service.process_file(
+    result = await resume_service.create_resumes(
         file=file.file,
         content_type=file.content_type,
         user_id=current_user.id
     )
-    raise HTTPException(501, 'Not implemented')
+    # raise HTTPException(501, 'Not implemented')
     return handle_result(result)

@@ -25,9 +25,12 @@ async def init_db(
 
 from app.crud import job, tag, user
 from app.schemas import UserCreate, JobCreate, TagCreate
+from app.services.user import get_password_hash
 async def init_defaults():
-    user_x = await user.get_by_username('x') or await user.create_user(UserCreate(username='x', email='x', password='x'))
-    user_y = await user.get_by_username('y') or await user.create_user(UserCreate(username='y', email='y', password='y'))
+    user_x = await user.get_by_username('x') \
+        or await user.create_user(UserCreate(username='x', email='x', password=await get_password_hash('x')))
+    user_y = await user.get_by_username('y') \
+        or await user.create_user(UserCreate(username='y', email='y', password=await get_password_hash('y')))
 
     job_1 = await job.get_by_user_and_name('Job 1', user_x.id) \
         or await job.create_job(JobCreate(name='Job 1', user_id=user_x.id, description='Job 1 description'))

@@ -1,14 +1,15 @@
 from typing import BinaryIO
 
 from beanie.odm.fields import PydanticObjectId
+from fastapi import Depends
 
 from app.services.main import GenericAppService
 from app.utils.service_result import ServiceResult
 from app.utils.app_exceptions import AppException
 from app.utils.file_handling import validate_file_size, validate_content_type
-from app.core.worker import add_task
-from app.services.task import TaskService
-
+from app.tasks.resume import ingest
+from app.engines.ingesting.engine import IngestingEngine
+from app.schemas import TaskOut
 
 class ResumeService(GenericAppService):
  
@@ -17,7 +18,8 @@ class ResumeService(GenericAppService):
         *,
         file: BinaryIO,
         content_type: str,
-        user_id: PydanticObjectId
+        user_id: PydanticObjectId,
+        ingesting_engine: IngestingEngine = Depends()
     ) -> ServiceResult:
         if not await validate_file_size(file):
             return ServiceResult(AppException.FileTooLarge())
@@ -26,11 +28,12 @@ class ResumeService(GenericAppService):
             context = {'detail': f'content {content_type} is not allowed'}
             return ServiceResult(AppException.InvalidFileType(context=context))
  
-        task_result = await add_task(
-            task=sum,
-            file=file,
-            number_2=20
-        )
+        task_result = await ingest.task(3, ingesting_engine)
+        return ServiceResult(TaskOut(
+            id=task_result.id,
+            status='accepted'            
+        ))
+
 
     async def get_resume() -> ServiceResult:
         pass

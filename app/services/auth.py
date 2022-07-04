@@ -13,6 +13,7 @@ from app import schemas
 from app.routers.api_v1.config import Config
 from app.utils.service_result import ServiceResult
 from app.utils.app_exceptions import AppException
+from app.models import User
 
 
 class AuthSettings(BaseSettings):
@@ -75,4 +76,4 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> ServiceResult
     user = await crud_users.get_by_username(username=token_data.username)
     if user is None:
         return ServiceResult(AppException.InvalidCredentials())
-    return user
+    return ServiceResult(user)

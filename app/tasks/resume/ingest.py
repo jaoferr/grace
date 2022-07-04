@@ -47,5 +47,8 @@ def task(
     # logger.info(f'Done processing batch {batch_id}')
     
     logger.info(f'Start task with duration={task_duration}')
-    time.sleep(task_duration)
+    for i in range(task_duration):
+        print(i)
+        time.sleep(1)
+
     logger.info('Task finished')
