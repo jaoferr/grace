@@ -7,7 +7,7 @@ from app.services.main import GenericAppService
 from app.utils.service_result import ServiceResult
 from app.utils.app_exceptions import AppException
 from app.utils.file_handling import validate_file_size, validate_content_type
-from app.tasks.resume import ingest
+from app.tasks.resume.tasks import ingest
 from app.engines.ingesting.engine import IngestingEngine
 from app.schemas import TaskOut
 
@@ -28,21 +28,16 @@ class ResumeService(GenericAppService):
             context = {'detail': f'content {content_type} is not allowed'}
             return ServiceResult(AppException.InvalidFileType(context=context))
  
-        task_result = await ingest.task(3, ingesting_engine)
+        task_result = ingest.delay(task_duration=3)
         return ServiceResult(TaskOut(
             id=task_result.id,
-            status='accepted'            
+            status=task_result.status         
         ))
 
+    async def generic_task(self, duration: int):
+        task_result = ingest.delay(task_duration=duration)
+        return ServiceResult(TaskOut(
+            id=task_result.id,
+            status=task_result.status
+        ))
 
-    async def get_resume() -> ServiceResult:
-        pass
-    
-    async def delete_resume() -> ServiceResult:
-        pass
-    
-    async def start_task() -> ServiceResult:
-        pass
-
-    async def validate_file() -> ServiceResult:
-        pass

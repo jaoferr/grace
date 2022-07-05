@@ -17,10 +17,11 @@ from app.core.worker import celery
 def is_file_allowed(filename: str):
     return '.' in filename and filename.split('.')[-1].lower() in settings.Hardcoded.ALLOWED_EXTENSIONS
 
-@celery.task(name='ingest')
-def task(
+@celery.task(name='ingest', bind=True)
+def ingest(
     # raw_file: BufferedRandom, user: User, 
     # batch_id: str, tag_name: str,
+    self,
     task_duration: int,
     engine: IngestingEngine = Depends()
 ):
@@ -48,7 +49,11 @@ def task(
     
     logger.info(f'Start task with duration={task_duration}')
     for i in range(task_duration):
-        print(i)
+        progress = round((i + 1) / task_duration * 100, 2)
+        print(f'Progress: {progress}%')
         time.sleep(1)
-
+        self.update_state(
+            state='PROGRESS',
+            meta={'progress': progress}
+        )
     logger.info('Task finished')
