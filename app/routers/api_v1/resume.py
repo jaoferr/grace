@@ -34,6 +34,7 @@ async def ingest(
     result = await resume_service.create_resumes(
         file=file.file,
         content_type=file.content_type,
-        user_id=current_user.id
+        user_id=current_user.id,
+        tag_id=tag_id
     )
     return handle_result(result)

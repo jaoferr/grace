@@ -1,16 +1,16 @@
-from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
-from fastapi import Form
 from pydantic import BaseModel
 from beanie.odm.fields import PydanticObjectId
+
 
 class ResumeBase(BaseModel):
     pass
 
 
 class ResumeCreate(ResumeBase):
-    user_id: int
-    tag_id: int
+    user_id: PydanticObjectId
+    tag_id: PydanticObjectId
+    file: bytes
     filename: str
     content: Dict[Any, Any]

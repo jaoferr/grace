@@ -13,5 +13,11 @@ def get_celery():
 
     return _celery
 
-
+def update_progress(self, current: int, total: int):
+    progress = round((current + 1) / total * 100, 2)
+    self.update_state(
+        state='PROGRESS',
+        meta={'progress': progress}
+    )
+    
 celery = get_celery()

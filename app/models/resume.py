@@ -6,9 +6,10 @@ from beanie.odm.fields import PydanticObjectId
 class Resume(Document):
     timestamp_added: datetime = datetime.utcnow()
     filename: str
+    raw_file: bytes
     content: str
     user_id: PydanticObjectId
     tag_id: PydanticObjectId
-    
+
     class Settings:
         name = 'resumes'

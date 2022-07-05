@@ -19,7 +19,7 @@ class ResumeService(GenericAppService):
         file: BinaryIO,
         content_type: str,
         user_id: PydanticObjectId,
-        ingesting_engine: IngestingEngine = Depends()
+        tag_id: PydanticObjectId
     ) -> ServiceResult:
         if not await validate_file_size(file):
             return ServiceResult(AppException.FileTooLarge())
@@ -28,7 +28,11 @@ class ResumeService(GenericAppService):
             context = {'detail': f'content {content_type} is not allowed'}
             return ServiceResult(AppException.InvalidFileType(context=context))
  
-        task_result = ingest.delay(task_duration=3)
+        task_result = ingest.delay(
+            raw_file=file,
+            user_id=user_id,
+            tag_id=tag_id
+        )
         return ServiceResult(TaskOut(
             id=task_result.id,
             status=task_result.status         

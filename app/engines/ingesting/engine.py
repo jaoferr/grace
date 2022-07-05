@@ -8,10 +8,14 @@ from app.core.config import settings
 
 class IngestingEngine(GenericEngine):
 
-    def __init__(self) -> None:
-        self.endpoint = settings.assemble_tika_endpoint()
+    def __init__(
+        self,
+        *,
+        endpoint: str = None
+    ) -> None:
+        self.endpoint = endpoint or settings.assemble_tika_endpoint()
 
-    def process_file(self, file_bytes: BinaryIO) -> dict[str: str]:
+    def extract_content(self, file_bytes: BinaryIO) -> dict[str: str]:
         ''' Process "any" file with tika '''
         parsed_pdf = parser.from_buffer(file_bytes.read(), serverEndpoint=self.endpoint)
         data = parsed_pdf.get('content')
@@ -19,3 +23,7 @@ class IngestingEngine(GenericEngine):
             'content': data
         }
         return result
+
+    def validate_file_extension(self, filename: str) -> bool:
+        return '.' in filename and filename.split('.')[-1].lower() \
+            in settings.Hardcoded.ALLOWED_EXTENSIONS
