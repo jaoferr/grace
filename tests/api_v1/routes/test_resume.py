@@ -29,7 +29,7 @@ async def test_resume_ingest(
         url=PREFIX + '.ingest', data=data, files=files
     )
     response_json = response.json()
-    
+
     assert response.status_code == 202
     assert response_json.get('detail') == ''
     assert PydanticObjectId.is_valid((response_json.get('task_id')))

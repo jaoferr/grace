@@ -1,7 +1,9 @@
+from beanie.odm.fields import PydanticObjectId
+
 from app import schemas
 from app.models import User
 
-async def get_by_id(user_id: str) -> User:
+async def get_by_id(user_id: PydanticObjectId) -> User:
     return await User.get(user_id)
 
 async def get_by_username(username: str) -> User:

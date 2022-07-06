@@ -1,4 +1,5 @@
 from celery import Celery
+from celery.utils.log import get_task_logger
 
 from app.core.config import settings
 
@@ -21,3 +22,4 @@ def update_progress(self, current: int, total: int):
     )
     
 celery = get_celery()
+celery_logger = get_task_logger(__name__)

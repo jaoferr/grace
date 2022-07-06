@@ -23,6 +23,7 @@ async def create(
     current_user: User = Depends(get_current_user),
     tag_service: TagService = Depends()
 ):
+    current_user = handle_result(current_user)
     result = await tag_service.create_tag(
         new_tag=new_tag,
         user_id=current_user.id
@@ -35,6 +36,7 @@ async def get_by_id(
     current_user: User = Depends(get_current_user),
     tag_service: TagService = Depends()
 ):
+    current_user = handle_result(current_user)
     result = await tag_service.get_tag(id=tag_id, user_id=current_user.id)
     return handle_result(result)
 
@@ -44,6 +46,7 @@ async def get_from_current_user(
     current_user: User = Depends(get_current_user),
     tag_service: TagService = Depends()
 ):
+    current_user = handle_result(current_user)
     result = await tag_service.get_tag_multi(
         user_id=current_user.id,
         skip=skip, limit=limit

@@ -8,11 +8,11 @@ from app.utils.service_result import ServiceResult
 from app.utils.app_exceptions import AppException
 from app.utils.file_handling import validate_file_size, validate_content_type
 from app.tasks.resume.tasks import ingest
-from app.engines.ingesting.engine import IngestingEngine
 from app.schemas import TaskOut
+from app.crud import temp_file_storage as crud_temp_file_storage
 
 class ResumeService(GenericAppService):
- 
+
     async def create_resumes(
         self,
         *,
@@ -27,15 +27,21 @@ class ResumeService(GenericAppService):
         if not await validate_content_type(content_type):
             context = {'detail': f'content {content_type} is not allowed'}
             return ServiceResult(AppException.InvalidFileType(context=context))
- 
-        task_result = ingest.delay(
-            raw_file=file,
-            user_id=user_id,
-            tag_id=tag_id
+
+        file.seek(0)
+        temp_file_in_db = await crud_temp_file_storage.store(file.read())
+
+        task_kwargs = {
+            'temp_file_id': str(temp_file_in_db.id),
+            'user_id': str(user_id),
+            'tag_id': str(tag_id)
+        }
+        task_result = ingest.apply_async(
+            kwargs=task_kwargs,
         )
         return ServiceResult(TaskOut(
             id=task_result.id,
-            status=task_result.status         
+            status=task_result.status
         ))
 
     async def generic_task(self, duration: int):
@@ -44,4 +50,3 @@ class ResumeService(GenericAppService):
             id=task_result.id,
             status=task_result.status
         ))
-

@@ -20,10 +20,15 @@ from celery.result import AsyncResult
 @router.get('.get')
 def get_task_status(task_id: str) -> TaskStatus:
     task_result = AsyncResult(task_id, app=celery)
+    if task_result.result:
+        progress = task_result.result.get('progress')
+    else:
+        progress = False
+
     status = ServiceResult(TaskStatus(
         id=task_id,
         status=task_result.status,
-        progress=task_result.result.get('progress')
+        progress=progress
     ))
     return handle_result(status)
 

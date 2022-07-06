@@ -11,7 +11,7 @@ from pydantic import BaseSettings
 
 from app import schemas
 from app.routers.api_v1.config import Config
-from app.utils.service_result import ServiceResult
+from app.utils.service_result import ServiceResult, handle_result
 from app.utils.app_exceptions import AppException
 from app.models import User
 
