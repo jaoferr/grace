@@ -32,14 +32,10 @@ def get_task_status(task_id: str) -> TaskStatus:
     ))
     return handle_result(status)
 
-from app.services.resume import ResumeService
+from app.tasks.generic.tasks import generic_task
 @router.post('.generic', response_model=None)
-async def generic_task(
-    duration: int,
-    resume_service: ResumeService = Depends()
-):
-
-    result = await resume_service.generic_task(
+def generic(duration: int):
+    result = generic_task(
         duration=duration
     )
     return handle_result(result)

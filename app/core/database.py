@@ -1,8 +1,12 @@
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
+from fastapi import Depends
 
 from app.core.config import settings
 from app.models import User, Job, Resume, Tag, TempFileStorage
+from app.crud import job, tag, user
+from app.schemas import UserCreate, JobCreate, TagCreate
+from app.services.user import get_password_hash
 
 
 def get_motor_client() -> AsyncIOMotorClient:
@@ -23,9 +27,6 @@ async def init_db(
         ]
     )
 
-from app.crud import job, tag, user
-from app.schemas import UserCreate, JobCreate, TagCreate
-from app.services.user import get_password_hash
 async def init_defaults():
     user_x = await user.get_by_username('x') \
         or await user.create_user(UserCreate(username='x', email='x', password=await get_password_hash('x')))

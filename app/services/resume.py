@@ -43,10 +43,3 @@ class ResumeService(GenericAppService):
             id=task_result.id,
             status=task_result.status
         ))
-
-    async def generic_task(self, duration: int):
-        task_result = ingest.delay(task_duration=duration)
-        return ServiceResult(TaskOut(
-            id=task_result.id,
-            status=task_result.status
-        ))
