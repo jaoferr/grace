@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from app import models, schemas
-from app.services.auth import get_current_user
+from app.services.auth import handled_get_current_user
 from app.routers.api_v1.config import Config
 from app.utils.service_result import handle_result
 
@@ -18,7 +18,7 @@ router = APIRouter(
 @router.post('.make', response_model=list[schemas.Recommendation])
 def make_recommendation(
     recommendation_request: schemas.RecommendationRequest,
-    current_user: models.User = Depends(get_current_user)
+    current_user: models.User = Depends(handled_get_current_user)
 ):
     # if not (job:= crud_jobs.get_job_by_id(db, recommendation_request.job_id, current_user.id)):
     #     raise HTTPException(404, f'job not found with job_id "{recommendation_request.job_id}"')
@@ -32,7 +32,6 @@ def make_recommendation(
     # )
 
     # return results
-    current_user = handle_result(current_user)
     return HTTPException(501, 'Not implemented')
 
 @router.get('.get_scoring_methods')

@@ -8,7 +8,7 @@ from starlette.exceptions import HTTPException
 from httpx import AsyncClient
 
 from app.main import get_application
-from app.services.auth import get_current_user
+from app.services.auth import handled_get_current_user
 from app.core.config import settings
 from app.core.database import init_db, get_motor_client
 from app.routers.api_v1.config import Config as api_v1_config
@@ -77,7 +77,7 @@ def current_user(app: FastAPI, generic_user: User) -> User:
     def get_test_current_user():
         return generic_user
 
-    app.dependency_overrides[get_current_user] = get_test_current_user
+    app.dependency_overrides[handled_get_current_user] = get_test_current_user
     return get_test_current_user()
 
 @pytest_asyncio.fixture(scope='function')

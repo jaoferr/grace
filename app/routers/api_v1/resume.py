@@ -9,7 +9,7 @@ from beanie.odm.fields import PydanticObjectId
 
 from app import schemas
 from app.models import User
-from app.services.auth import get_current_user
+from app.services.auth import handled_get_current_user
 from app.services.resume import ResumeService
 from app.routers.api_v1.config import Config
 from app.utils.service_result import handle_result
@@ -27,10 +27,9 @@ router = APIRouter(
 async def ingest(
     file: UploadFile, 
     tag_id: PydanticObjectId = Form(...),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(handled_get_current_user),
     resume_service: ResumeService = Depends()
 ):
-    current_user = handle_result(current_user)
     result = await resume_service.create_resumes(
         file=file.file,
         content_type=file.content_type,
