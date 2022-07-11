@@ -26,7 +26,7 @@ async def get_by_tag_id_and_user(tag_id: str, user_id: str, skip: int = 0, limit
 async def create_resume(new_resume: schemas.ResumeCreate) -> Resume:
     resume_db = Resume(
         filename=new_resume.filename,
-        file=new_resume.file,
+        raw_file=new_resume.raw_file,
         user_id=new_resume.user_id,
         tag_id=new_resume.tag_id,
         content=new_resume.content

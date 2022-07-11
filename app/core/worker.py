@@ -1,4 +1,4 @@
-from celery import Celery
+from celery import Celery, Task
 from celery.utils.log import get_task_logger
 
 from app.core.config import settings
@@ -14,7 +14,7 @@ def get_celery():
 
     return _celery
 
-def update_progress(self, current: int, total: int):
+def update_progress(self: Task, current: int, total: int):
     progress = round((current + 1) / total * 100, 2)
     self.update_state(
         state='PROGRESS',

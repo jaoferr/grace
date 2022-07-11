@@ -1,13 +1,12 @@
 from fastapi import (
     APIRouter, 
     Depends,
-    HTTPException,
     UploadFile,
     Form
 )
 from beanie.odm.fields import PydanticObjectId
 
-from app import schemas
+from app.schemas import TaskOut
 from app.models import User
 from app.services.auth import handled_get_current_user
 from app.services.resume import ResumeService
@@ -23,7 +22,7 @@ router = APIRouter(
     }
 )
 
-@router.post('.ingest', response_model=None)
+@router.post('.ingest', response_model=TaskOut, status_code=202)
 async def ingest(
     file: UploadFile, 
     tag_id: PydanticObjectId = Form(...),

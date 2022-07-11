@@ -11,6 +11,6 @@ class ResumeBase(BaseModel):
 class ResumeCreate(ResumeBase):
     user_id: PydanticObjectId
     tag_id: PydanticObjectId
-    file: bytes
+    raw_file: bytes
     filename: str
     content: Dict[Any, Any]

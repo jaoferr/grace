@@ -79,4 +79,4 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> ServiceResult
     return ServiceResult(user)
 
 async def handled_get_current_user(token: str = Depends(oauth2_scheme)) -> User:
-    return handle_result(get_current_user(token))
+    return handle_result(await get_current_user(token))

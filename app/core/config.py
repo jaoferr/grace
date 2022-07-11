@@ -63,7 +63,7 @@ class Settings(BaseSettings):
         return conn_string
 
     def assemble_tika_endpoint(self):
-        endpoint = f'{self.TIKA_ADAPTER}://{self.TIKA_HOST}:{self.TIKA_HOST}'
+        endpoint = f'{self.TIKA_ADAPTER}://{self.TIKA_HOST}:{self.TIKA_PORT}'
         return endpoint
 
     def assemble_celery_broker_url(self):

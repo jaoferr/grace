@@ -10,9 +10,11 @@ from io import BytesIO
 
 from app.engines.ingesting.engine import IngestingEngine
 from app.core.worker import celery, update_progress, celery_logger
+from app.core.database import init_db, get_motor_client
 from app.schemas import ResumeCreate
 from app import models
 from app.crud import temp_file_storage as crud_temp_file_storage
+
 
 @celery.task(name='ingest', bind=True)
 def ingest(self, **kwargs):
@@ -24,8 +26,7 @@ def ingest(self, **kwargs):
         tag_id: PydanticObjectId,
         engine: IngestingEngine = IngestingEngine()
     ):
-        # from app.core.database import init_db, get_motor_client
-        # await init_db(get_motor_client())
+        await init_db(get_motor_client())
 
         raw_file_in_db = await crud_temp_file_storage.get_by_id(temp_file_id)
         raw_file_bytes = BytesIO(raw_file_in_db.file_content)
@@ -41,7 +42,7 @@ def ingest(self, **kwargs):
                 new_resume = await crud_resume.create_resume(
                     ResumeCreate(
                         user_id=user_id, tag_id=tag_id,
-                        file=zip_bytes, filename=file.filename,
+                        raw_file=zip_bytes, filename=file.filename,
                         content=content
                     )
                 )

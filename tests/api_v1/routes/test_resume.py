@@ -1,5 +1,6 @@
 from io import BytesIO
 from zipfile import ZipFile
+from uuid import UUID
 
 import pytest
 from beanie.odm.fields import PydanticObjectId
@@ -31,8 +32,8 @@ async def test_resume_ingest(
     response_json = response.json()
 
     assert response.status_code == 202
-    assert response_json.get('detail') == ''
-    assert PydanticObjectId.is_valid((response_json.get('task_id')))
+    assert response_json.get('status') == 'PENDING'
+    assert UUID(response_json.get('id'))
 
 # @pytest.mark.asyncio
 # async def test_resume_ingest_invalid_file_type(client: AsyncClient, current_user: User):
